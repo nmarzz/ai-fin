@@ -4,7 +4,17 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 
 
 ## Data
-- [Kaggle NYSE data](https://www.kaggle.com/dgawlik/nyse)  
+
+#### Traditional
+
+- [NYSE](https://www.kaggle.com/dgawlik/nyse)  
+- [Istanbul SE](https://www.kaggle.com/uciml/istanbul-stock-exchange)
+- [World News + Stock data](https://www.kaggle.com/aaron7sun/stocknews)
+
+#### Crypto
+
+- [Daily Prices all coins](https://www.kaggle.com/jessevent/all-crypto-currencies)
+- [Another Daily Prices](https://www.kaggle.com/taniaj/cryptocurrency-market-history-coinmarketcap)
 
 
 ## Papers
