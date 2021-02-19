@@ -29,3 +29,15 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 - [Deep RL for Finance library](https://github.com/AI4Finance-LLC/FinRL-Library)
 - [A VERY good repo with links to everything](https://github.com/firmai/financial-machine-learning)  
 - [Dual Attention Model Git](https://github.com/Seanny123/da-rnn)  
+
+
+
+## Propostions
+
+- Explore transfer learning of RL in the context of finance. ie, train a model on traditional markets and then apply the model to crypto trading 
+    - Do we need to fine tune? 
+    - If so to what extent?
+    - Is it more efficient to adapt or retrain?
+
+
+
