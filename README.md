@@ -29,6 +29,7 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 - [Deep RL for Finance library](https://github.com/AI4Finance-LLC/FinRL-Library)
 - [A VERY good repo with links to everything](https://github.com/firmai/financial-machine-learning)  
 - [Dual Attention Model Git](https://github.com/Seanny123/da-rnn)  
+- [Understandable RL algo implementations](https://github.com/higgsfield/RL-Adventure-2)
 
 
 
