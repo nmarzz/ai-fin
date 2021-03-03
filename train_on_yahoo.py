@@ -1,3 +1,7 @@
+# TODO:
+# Make data folder if not exist
+
+
 import sys
 import os
 sys.path.append("../FinRL-Library")
@@ -29,7 +33,8 @@ n_cores = multiprocessing.cpu_count() - 2
 
 startdate = '2009-01-01'
 enddate = '2021-01-19'
-
+train_steps = 5000
+modelName = 'dow30_steps{}_start{}_end{}.model'.format(train_steps,startdate,enddate)
 df_name = 'data/dow30_start{}_end{}'.format(startdate,enddate)
 
 stock_tickers = config.DOW_30_TICKER
@@ -103,3 +108,13 @@ policy_kwargs = {
 model = agent.get_model("ppo",
                         model_kwargs = ppo_params,
                         policy_kwargs = policy_kwargs, verbose = 1)
+
+print('Training model')
+model.learn(total_timesteps = train_steps, # NOTE: be careful how many timesteps you say (Default for code testing ~ 5000)
+            eval_env = env_trade,
+            eval_freq = 250,
+            log_interval = 1,
+            tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+            n_eval_episodes = 1)
+
+model.save(modelName)
