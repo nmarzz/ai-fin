@@ -111,11 +111,11 @@ model = model.load(modelName)
 
 ## Now we begin testing the model
 df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
-
-
 backtest_results = backtest_stats(account_value=df_account_value, value_col_name = 'total_assets')
 
-backtest_plot(df_account_value,
-             baseline_ticker = '^DJI',
-             baseline_start = '2019-01-01',
-             baseline_end = '2021-01-01', value_col_name = 'total_assets')
+
+
+# backtest_plot(df_account_value,
+#              baseline_ticker = '^DJI',
+#              baseline_start = '2019-01-01',
+#              baseline_end = '2021-01-01', value_col_name = 'total_assets')
