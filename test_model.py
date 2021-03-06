@@ -32,6 +32,7 @@ n_cores = multiprocessing.cpu_count() - 2
 
 
 startdate = '2009-01-01'
+splitdate = '2019-01-01'
 enddate = '2021-01-19'
 train_steps = 5000
 modelName = 'dow30_steps{}_start{}_end{}.model'.format(train_steps,startdate,enddate)
@@ -64,8 +65,8 @@ else:
 
 
 # Now define the training enviroment
-df_train = data_split(df, startdate,'2019-01-01')
-df_test = data_split(df, '2019-01-01','2021-01-01')
+df_train = data_split(df, startdate,splitdate)
+df_test = data_split(df, splitdate,enddate)
 
 information_cols = ['daily_variance', 'change', 'log_volume', 'close','day',
                     'macd', 'rsi_30', 'cci_30', 'dx_30', 'turbulence']
@@ -108,16 +109,15 @@ model = agent.get_model("ppo",
                         policy_kwargs = policy_kwargs, verbose = 1)
 model = model.load(modelName)
 
-
 ## Now we begin testing the model
-
-insample_turbulence = df_train.drop_duplicates(subset=['date'])
-turbulence_threshold = np.quantile(insample_turbulence.turbulence.values,1)
-
 test_gym.hmax = 2500
 
 df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
 
 
 backtest_results = backtest_stats(account_value=df_account_value, value_col_name = 'total_assets')
-print(backtest_results)
+
+backtest_plot(df_account_value,
+             baseline_ticker = '^DJI',
+             baseline_start = '2019-01-01',
+             baseline_end = '2021-01-01', value_col_name = 'total_assets')
