@@ -118,4 +118,4 @@ test_gym.hmax = 2500
 print(len(test_gym.dates))
 
 df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
-df_account_value.head(50)
+print(df_account_value.head(50))
