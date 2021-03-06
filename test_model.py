@@ -115,7 +115,9 @@ insample_turbulence = df_train.drop_duplicates(subset=['date'])
 turbulence_threshold = np.quantile(insample_turbulence.turbulence.values,1)
 
 test_gym.hmax = 2500
-print(len(test_gym.dates))
 
 df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
-print(df_account_value.head(50))
+
+
+backtest_results = backtest_stats(account_value=df_account_value, value_col_name = 'total_assets')
+print(backtest_results)
