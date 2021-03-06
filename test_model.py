@@ -110,8 +110,6 @@ model = agent.get_model("ppo",
 model = model.load(modelName)
 
 ## Now we begin testing the model
-test_gym.hmax = 2500
-
 df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
 
 
