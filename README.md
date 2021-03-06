@@ -26,7 +26,7 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 
 ## Textbooks
 - [Advances in Financial Machine Learning (Marco Lopez De Prado)](https://www.amazon.ca/Advances-Financial-Machine-Learning-Marcos/dp/1119482089)
-   -sfs
+  -  sfds
 ## Code
 
 - [Deep RL for Finance library](https://github.com/AI4Finance-LLC/FinRL-Library)
