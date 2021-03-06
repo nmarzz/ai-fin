@@ -21,7 +21,7 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 
 - [Dual Attention Model]( https://arxiv.org/pdf/1704.02971.pdf)  
 - [2020 review paper](https://arxiv.org/abs/2003.01859)  
-- [Training a Neural Network with Financial Criterion](http://www.iro.umontreal.ca/~lisa/pointeurs/nncm.pdf)
+- [Training a Neural Network with a Financial Criterion Rather than a Prediction Criterion](http://www.iro.umontreal.ca/~lisa/pointeurs/nncm.pdf)
 - [1996 Classic Yoshua Paper](https://papers.nips.cc/paper/1996/file/1d72310edc006dadf2190caad5802983-Paper.pdf)  
   -  I think this paper presents results and general ideas related to paper above.
   -  They implement linear layers (5-3-1 and 5-3-2-1)
