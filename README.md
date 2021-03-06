@@ -24,6 +24,9 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 - [1996 Classic Yoshua Paper](https://papers.nips.cc/paper/1996/file/1d72310edc006dadf2190caad5802983-Paper.pdf)  
 - [An adversarial approach](https://www.ijcai.org/Proceedings/2019/0810.pdf)  
 
+## Textbooks
+- [Advances in Financial Machine Learning (Marco Lopez De Prado)](https://www.amazon.ca/Advances-Financial-Machine-Learning-Marcos/dp/1119482089)
+   -sfs
 ## Code
 
 - [Deep RL for Finance library](https://github.com/AI4Finance-LLC/FinRL-Library)
