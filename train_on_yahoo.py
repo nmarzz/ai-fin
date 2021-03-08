@@ -105,7 +105,7 @@ test_gym = StockTradingEnvV2(df = df_test,initial_amount = initial_investment,hm
 
 
 # this is our training env. It allows multiprocessing
-env_train, _ = train_gym.get_multiproc_env()
+env_train, _ = train_gym.get_sb_env()
 env_trade, _ = test_gym.get_sb_env()
 
 
