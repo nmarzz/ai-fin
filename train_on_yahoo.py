@@ -106,6 +106,7 @@ test_gym = StockTradingEnvV2(df = df_test,initial_amount = initial_investment,hm
 env_train, _ = train_gym.get_multiproc_env(n = n_cores)
 env_trade, _ = test_gym.get_sb_env()
 
+
 agent = DRLAgent(env = env_train)
 
 ppo_params ={'n_steps': 256,
@@ -114,16 +115,20 @@ ppo_params ={'n_steps': 256,
              'batch_size': 512,
             'gamma': 0.99}
 
+model_params = {x: config.__dict__[args.model]}
+
+print(model_params)
+
 policy_kwargs = {
     "net_arch": [1024, 1024,1024, 1024,  1024],
 }
 
-model = agent.get_model("ppo",
-                        model_kwargs = ppo_params,
+model = agent.get_model(args.model,
+                        model_kwargs = model_params,
                         policy_kwargs = policy_kwargs, verbose = 1)
 
 print('Training model')
-model.learn(total_timesteps = train_steps, # NOTE: be careful how many timesteps you say (Default for code testing ~ 5000)
+model.learn(total_timesteps = train_steps,
             eval_env = env_trade,
             eval_freq = 250,
             log_interval = 1,
