@@ -1,7 +1,7 @@
 # TODO:
 # Make data folder if not exist
 
-
+import argparse
 import sys
 import os
 sys.path.append("../FinRL-Library")
@@ -25,16 +25,29 @@ from utils.enviroments import StockTradingEnvV2
 import itertools
 import pyfolio
 
-
 n_cores = multiprocessing.cpu_count() - 2
 
 
 
+parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+parser.add_argument('--model', type=str, metavar='MOD',
+                    help='Options [ppo,ddpg,a2c,td3,sac]')
+parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
+args = parser.parse_args()
+
+
+
+print('Arguements:')
+for p in vars(args).items():
+    print('  ',p[0]+': ',p[1])
+print('\n')
+
 
 startdate = '2009-01-01'
+splitdate = '2019-01-01'
 enddate = '2021-01-19'
-train_steps = 5000
-modelName = 'dow30_steps{}_start{}_end{}.model'.format(train_steps,startdate,enddate)
+train_steps = args.train_steps
+modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,enddate)
 df_name = 'data/dow30_start{}_end{}'.format(startdate,enddate)
 
 stock_tickers = config.DOW_30_TICKER

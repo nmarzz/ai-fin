@@ -134,7 +134,6 @@ baseline_returns = get_daily_return(baseline_dji, value_col_name='close')
 # plt.legend(['us','dji'])
 # plt.savefig("mygraph.png")
 
-
 test_returns.to_csv('f.csv')
 baseline_returns.to_csv('me.csv')
 #
