@@ -115,7 +115,7 @@ ppo_params ={'n_steps': 256,
              'batch_size': 512,
             'gamma': 0.99}
 
-model_params = {x: config.__dict__[args.model]}
+model_params = {args.model: config.__dict__[args.model]}
 
 print(model_params)
 
