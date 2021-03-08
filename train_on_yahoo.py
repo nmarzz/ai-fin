@@ -126,7 +126,7 @@ policy_kwargs = {
 
 model = agent.get_model(args.model,
                         model_kwargs = model_params,
-                        policy_kwargs = None, verbose = 1)
+                        verbose = 1)
 
 print('Training model')
 model.learn(total_timesteps = train_steps,
