@@ -35,6 +35,8 @@ parser.add_argument('--model', type=str, metavar='MOD',
 parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
 args = parser.parse_args()
 
+if not args.model in ['ppo','ddpg','a2c','td3','sac']:
+    raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
 
 
 print('Arguements:')
@@ -116,9 +118,6 @@ ppo_params ={'n_steps': 256,
             'gamma': 0.99}
 
 model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
-
-print(model_params)
-print('made it baby')
 
 
 policy_kwargs = {
