@@ -6,7 +6,6 @@ from gym import spaces
 import matplotlib
 from copy import deepcopy
 
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pickle
 from stable_baselines3.common.vec_env import DummyVecEnv

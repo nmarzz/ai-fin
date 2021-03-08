@@ -22,6 +22,7 @@ from pprint import pprint
 import multiprocessing
 
 from utils.enviroments import StockTradingEnvV2
+from utils.preprocess import get_daily_return
 import itertools
 import pyfolio
 
@@ -88,6 +89,8 @@ test_gym = StockTradingEnvV2(df = df_test,initial_amount = initial_investment,hm
                                 daily_information_cols = information_cols,
                                 print_verbosity = 500, random_start = False)
 
+test_gym.seed(1331)
+
 
 
 # this is our training env. It allows multiprocessing
@@ -113,6 +116,32 @@ model = model.load(modelName)
 df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
 backtest_results = backtest_stats(account_value=df_account_value, value_col_name = 'total_assets')
 
+def backtest(account_values,baseline):
+    pass
+
+baseline_ticker = "^DJI"
+baseline_dji = YahooDownloader(
+            start_date= startdate, end_date=enddate, ticker_list=[baseline_ticker]
+        ).fetch_data()
+
+test_returns = get_daily_return(df_account_value, value_col_name='total_assets')
+baseline_returns = get_daily_return(baseline_dji, value_col_name='close')
+
+
+#
+# plt.plot(test_returns)
+# plt.plot(baseline_returns)
+# plt.legend(['us','dji'])
+# plt.savefig("mygraph.png")
+
+
+test_returns.to_csv('f.csv')
+baseline_returns.to_csv('me.csv')
+#
+# with pyfolio.plotting.plotting_context(context = "paper",font_scale=1.1):
+#         pyfolio.create_full_tear_sheet(
+#             returns=test_returns, benchmark_rets=baseline_returns, set_context=False
+#         )
 
 
 # backtest_plot(df_account_value,
