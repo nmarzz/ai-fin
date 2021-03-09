@@ -29,10 +29,15 @@ n_cores = multiprocessing.cpu_count() - 2
 
 
 
-parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+parser = argparse.ArgumentParser(description='Training RL Stock Traders')
 parser.add_argument('--model', type=str, metavar='MOD',
                     help='Options [ppo,ddpg,a2c,td3,sac]')
 parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
+parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
+parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--split-date',type = str,default = '2019-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--end-date',type = str,default = '2021-01-19', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+
 args = parser.parse_args()
 
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
@@ -45,9 +50,9 @@ for p in vars(args).items():
 print('\n')
 
 
-startdate = '2009-01-01'
-splitdate = '2019-01-01'
-enddate = '2021-01-19'
+startdate = args.start_date
+splitdate = args.split_date
+enddate = args.end_date
 train_steps = args.train_steps
 modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,enddate)
 df_name = 'data/dow30_start{}_end{}'.format(startdate,enddate)
@@ -102,27 +107,13 @@ test_gym = StockTradingEnvV2(df = df_test,initial_amount = initial_investment,hm
                                 daily_information_cols = information_cols,
                                 print_verbosity = 500, random_start = False)
 
-
-
 # this is our training env. It allows multiprocessing
 env_train, _ = train_gym.get_sb_env()
 env_trade, _ = test_gym.get_sb_env()
 
 
 agent = DRLAgent(env = env_train)
-
-ppo_params ={'n_steps': 256,
-             'ent_coef': 0.01,
-             'learning_rate': 0.00009,
-             'batch_size': 512,
-            'gamma': 0.99}
-
 model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
-
-
-policy_kwargs = {
-    "net_arch": [1024, 1024,1024, 1024,  1024],
-}
 
 model = agent.get_model(args.model,
                         model_kwargs = model_params,
