@@ -19,13 +19,10 @@ from finrl.env.env_stocktrading import StockTradingEnv
 from finrl.model.models import DRLAgent,DRLEnsembleAgent
 from finrl.trade.backtest import backtest_stats, get_baseline, backtest_plot
 from pprint import pprint
-import multiprocessing
 
 from utils.enviroments import StockTradingEnvV2
 import itertools
 import pyfolio
-
-n_cores = multiprocessing.cpu_count() - 2
 
 
 
@@ -37,11 +34,16 @@ parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = '
 parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--split-date',type = str,default = '2019-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--end-date',type = str,default = '2021-01-19', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
+parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
+args.model = 'ppo'
+
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
+
 
 
 print('Arguements:')
@@ -54,8 +56,8 @@ startdate = args.start_date
 splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
-modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,enddate)
-df_name = 'data/dow30_start{}_end{}'.format(startdate,enddate)
+modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,splitdate)
+df_name = os.path.join(args.datadir,'dow30_start{}_end{}'.format(startdate,enddate))
 
 stock_tickers = config.DOW_30_TICKER
 indicators = config.TECHNICAL_INDICATORS_LIST
@@ -127,4 +129,4 @@ model.learn(total_timesteps = train_steps,
             tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
             n_eval_episodes = 1)
 
-model.save(modelName)
+model.save(os.path.join(args.modeldir,modelName))
