@@ -57,6 +57,10 @@ modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type
 
 df_name = os.path.join(args.datadir,'{}_start{}_end{}'.format(args.data_type,startdate,enddate))
 
+
+print(df_name)
+print(modelName)
+
 stock_tickers = config.DOW_30_TICKER
 indicators = config.TECHNICAL_INDICATORS_LIST
 
