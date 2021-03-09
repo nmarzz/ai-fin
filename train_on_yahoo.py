@@ -44,7 +44,7 @@ if not args.model in ['ppo','ddpg','a2c','td3','sac']:
 
 
 
-print('Arguements:')
+print('Arguments:')
 for p in vars(args).items():
     print('  ',p[0]+': ',p[1])
 print('\n')
