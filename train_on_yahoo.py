@@ -39,8 +39,6 @@ parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
-args.model = 'ppo'
-
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
 
