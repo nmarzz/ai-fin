@@ -1,5 +1,6 @@
 # TODO:
 # Make data folder if not exist
+# Raise error or warning when data selection dates are not sharp
 
 import argparse
 import sys
@@ -40,6 +41,9 @@ parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
+args.model = 'ppo'
+args.data_type = 'crypto'
+
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
 if not args.data_type in ['dow30','crypto']:
@@ -57,8 +61,8 @@ train_steps = args.train_steps
 modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,enddate)
 
 # df_name = os.path.join(args.datadir,'{}_start{}_end{}'.format(args.data_type,startdate,enddate))
-data = utils.data_utils.get_train_dataset(args.datadir,'crypto',args.start_date,args.end_date)
-
+data = utils.data_utils.get_train_dataset(args.datadir,args.data_type,args.start_date,args.end_date)
+print(data.head())
 # # Get data
 # if os.path.exists(df_name):
 #     df = pd.read_csv(df_name)

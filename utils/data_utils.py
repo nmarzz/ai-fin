@@ -2,6 +2,7 @@ import sys
 sys.path.append("../FinRL-Library")
 
 import pandas as pd
+import numpy as np
 import os
 from finrl.config import config
 from finrl.marketdata.yahoodownloader import YahooDownloader
@@ -15,7 +16,8 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
 
 
 
-    data_path = os.path.join(datadir,data_type,'.csv')
+    data_path = os.path.join(datadir,data_type + '.csv')
+    print(data_path)
 
     if not os.path.exists(data_path):
         if data_type == 'dow30':
@@ -23,8 +25,8 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
             stock_tickers = config.DOW_30_TICKER
             indicators = config.TECHNICAL_INDICATORS_LIST
             print('Getting Data: ')
-            df = YahooDownloader(start_date = start_date,
-                                 end_date = end_date,
+            df = YahooDownloader(start_date = '2000-01-01',
+                                 end_date = '2021-01-01',
                                  ticker_list = stock_tickers).fetch_data()
 
             fe = FeatureEngineer(
@@ -32,6 +34,9 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
                             tech_indicator_list = indicators,
                             use_turbulence=True,
                             user_defined_feature = False)
+
+
+
 
             print('Adding Indicators')
             df = fe.preprocess_data(df)
@@ -41,3 +46,11 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
             df.to_csv(data_path,index = False)
         else:
             raise ValueError('Need to add crypto data to data directory')
+
+    # Load and subset data
+    full_df = pd.read_csv(data_path)
+    to_return = full_df[full_df['date'] >= start_date]
+    to_return = to_return[to_return['date'] <= end_date]
+
+
+    return to_return
