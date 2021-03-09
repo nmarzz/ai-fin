@@ -21,6 +21,7 @@ from finrl.trade.backtest import backtest_stats, get_baseline, backtest_plot
 from pprint import pprint
 
 from utils.enviroments import StockTradingEnvV2
+import utils.data_utils
 import itertools
 import pyfolio
 
@@ -55,15 +56,8 @@ enddate = args.end_date
 train_steps = args.train_steps
 modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,enddate)
 
-df_name = os.path.join(args.datadir,'{}_start{}_end{}'.format(args.data_type,startdate,enddate))
-
-
-print(df_name)
-print(modelName)
-
-stock_tickers = config.DOW_30_TICKER
-indicators = config.TECHNICAL_INDICATORS_LIST
-
+# df_name = os.path.join(args.datadir,'{}_start{}_end{}'.format(args.data_type,startdate,enddate))
+data = utils.data_utils.get_train_dataset(args.datadir,'crypto',args.start_date,args.end_date)
 
 # # Get data
 # if os.path.exists(df_name):

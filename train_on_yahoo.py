@@ -55,7 +55,7 @@ splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
 modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,splitdate)
-df_name = os.path.join(args.datadir,'dow30_start{}_end{}'.format(startdate,enddate))
+df_name = os.path.join(args.datadir,'dow30_start{}_end{}.csv'.format(startdate,enddate))
 
 stock_tickers = config.DOW_30_TICKER
 indicators = config.TECHNICAL_INDICATORS_LIST
@@ -64,6 +64,7 @@ indicators = config.TECHNICAL_INDICATORS_LIST
 if os.path.exists(df_name):
     df = pd.read_csv(df_name)
 else:
+    
     print('Getting Data: ')
     df = YahooDownloader(start_date = startdate,
                          end_date = enddate,
