@@ -41,8 +41,6 @@ parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
-args.model = 'ppo'
-args.data_type = 'crypto'
 
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
@@ -60,9 +58,20 @@ enddate = args.end_date
 train_steps = args.train_steps
 modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,enddate)
 
-# df_name = os.path.join(args.datadir,'{}_start{}_end{}'.format(args.data_type,startdate,enddate))
+# get testing data
 data = utils.data_utils.get_train_dataset(args.datadir,args.data_type,args.start_date,args.end_date)
-print(data.head())
+
+# get model
+
+# make testing enviroment
+
+# test model
+
+# save testing results
+
+
+
+
 # # Get data
 # if os.path.exists(df_name):
 #     df = pd.read_csv(df_name)

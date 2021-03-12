@@ -2,6 +2,7 @@ import sys
 sys.path.append("../FinRL-Library")
 
 import pandas as pd
+import warnings
 import numpy as np
 import os
 from finrl.config import config
@@ -16,8 +17,7 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
 
 
 
-    data_path = os.path.join(datadir,data_type + '.csv')
-    print(data_path)
+    data_path = os.path.join(datadir,data_type + '.csv')    
 
     if not os.path.exists(data_path):
         if data_type == 'dow30':
@@ -49,6 +49,15 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
 
     # Load and subset data
     full_df = pd.read_csv(data_path)
+    max_date = max(full_df['date'])
+    min_date = min(full_df['date'])
+
+
+    if not (min_date == start_date):
+        warnings.warn('Earliest possible start date is {}: You have chosen {}. The later date will be used'.format(min_date,start_date))
+    if not (max_date == end_date):
+        warnings.warn('Latest possible start date is {}: You have chosen {}. The earlier date will be used'.format(max_date,end_date))
+
     to_return = full_df[full_df['date'] >= start_date]
     to_return = to_return[to_return['date'] <= end_date]
 

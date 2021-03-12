@@ -33,7 +33,7 @@ parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
 parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
 parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--split-date',type = str,default = '2019-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--end-date',type = str,default = '2021-01-19', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--end-date',type = str,default = '2021-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
@@ -64,7 +64,7 @@ indicators = config.TECHNICAL_INDICATORS_LIST
 if os.path.exists(df_name):
     df = pd.read_csv(df_name)
 else:
-    
+
     print('Getting Data: ')
     df = YahooDownloader(start_date = startdate,
                          end_date = enddate,
