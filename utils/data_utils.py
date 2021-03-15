@@ -63,7 +63,7 @@ def get_dataset(datadir,data_type,start_date,end_date):
     if not (min_date <= start_date):
         warnings.warn('Earliest possible start date is {}: You have chosen {}. The later date will be used'.format(min_date,start_date))
     if not (max_date >= end_date):
-        warnings.warn('Latest possible start date is {}: You have chosen {}. The earlier date will be used'.format(max_date,end_date))
+        warnings.warn('Latest possible end date is {}: You have chosen {}. The earlier date will be used'.format(max_date,end_date))
 
     to_return = data_split(full_df,start_date,end_date)
 

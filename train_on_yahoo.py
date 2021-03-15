@@ -72,10 +72,6 @@ df_train = get_dataset(args.datadir,'dow30',args.start_date,args.split_date)
 
 df_test = get_dataset(args.datadir,'dow30',args.split_date,args.end_date)
 
-print(df_train.head())
-
-d = df_train.loc[0,:]
-
 stock_dimension = len(df_train.tic.unique())
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
@@ -105,8 +101,13 @@ model = agent.get_model(args.model,
                         verbose = 1)
 
 print('Training model')
-model.learn(total_timesteps = train_steps,
-            log_interval = 1,
-            tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()))
+# model.learn(total_timesteps = train_steps,
+#             log_interval = 1,
+#             tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()))
 
-model.save(os.path.join(args.modeldir,modelName))
+trained_model = agent.train_model(model = model,
+                                  tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+                                  total_timesteps = train_steps
+                                  )
+
+trained_model.save(os.path.join(args.modeldir,modelName))
