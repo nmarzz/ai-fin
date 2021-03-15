@@ -22,6 +22,10 @@ from pprint import pprint
 
 from utils.enviroments import StockTradingEnvV2
 from utils.data_utils import get_dataset
+
+import sys
+sys.path.append("../FinRL-Library")
+
 import itertools
 import pyfolio
 

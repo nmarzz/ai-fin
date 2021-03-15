@@ -49,7 +49,7 @@ def get_dataset(datadir,data_type,start_date,end_date):
             processed_full = processed_full.sort_values(['date','tic'])
 
             processed_full = processed_full.fillna(0)
-            processed_full.to_csv(data_path,index = False)
+            processed_full.to_csv(data_path)
         else:
             raise ValueError('Need to add crypto data to data directory')
 
