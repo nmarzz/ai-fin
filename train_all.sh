@@ -7,5 +7,5 @@ for model in ppo ddpg a2c td3 sac
 do
   python train_on_yahoo.py\
    --model $model
-   --train-steps trainsteps
+   --train-steps $trainsteps
 done
