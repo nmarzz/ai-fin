@@ -92,7 +92,7 @@ information_cols = ['daily_variance', 'change', 'log_volume', 'close','day',
                     'macd', 'rsi_30', 'cci_30', 'dx_30', 'turbulence']
 
 initial_investment = 1e6
-train_gym = StockTradingEnvV2(df = df_train,initial_amount = initial_investment,hmax = 5000,
+train_gym = StockTradingEnv(df = df_train,initial_amount = initial_investment,hmax = 5000,
                                 out_of_cash_penalty = 0,
                                 cache_indicator_data=False,
                                 cash_penalty_proportion=0.2,
@@ -100,7 +100,7 @@ train_gym = StockTradingEnvV2(df = df_train,initial_amount = initial_investment,
                                 daily_information_cols = information_cols,
                                 print_verbosity = 500, random_start = True)
 
-test_gym = StockTradingEnvV2(df = df_test,initial_amount = initial_investment,hmax = 5000,
+test_gym = StockTradingEnv(df = df_test,initial_amount = initial_investment,hmax = 5000,
                                 out_of_cash_penalty = 0,
                                 cash_penalty_proportion=0.2,
                                 reward_scaling = 1,
