@@ -69,13 +69,17 @@ indicators = config.TECHNICAL_INDICATORS_LIST
 
 # Get data
 df_train = get_dataset(args.datadir,'dow30',args.start_date,args.split_date)
+
+
 df_test = get_dataset(args.datadir,'dow30',args.split_date,args.end_date)
 
+print(df_train.head())
+
+d = df_train.loc[0,:]
 
 stock_dimension = len(df_train.tic.unique())
-state_space = 1 + 2*stock_dimension + len(config.TECHNICAL_INDICATORS_LIST)*stock_dimension
+state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
-
 
 env_kwargs = {
     "hmax": 100,
@@ -84,7 +88,7 @@ env_kwargs = {
     "sell_cost_pct": 0.001,
     "state_space": state_space,
     "stock_dim": stock_dimension,
-    "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
+    "tech_indicator_list": indicators,
     "action_space": stock_dimension,
     "reward_scaling": 1e-4
 
@@ -92,45 +96,18 @@ env_kwargs = {
 
 e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
 
-#
-# information_cols = ['daily_variance', 'change', 'log_volume', 'close','day',
-#                     'macd', 'rsi_30', 'cci_30', 'dx_30', 'turbulence']
-#
-# initial_investment = 1e6
-# train_gym = StockTradingEnv(df = df_train,initial_amount = initial_investment,hmax = 5000,
-#                                 out_of_cash_penalty = 0,
-#                                 cache_indicator_data=False,
-#                                 cash_penalty_proportion=0.2,
-#                                 reward_scaling=1,
-#                                 daily_information_cols = information_cols,
-#                                 print_verbosity = 500, random_start = True)
-#
-# test_gym = StockTradingEnv(df = df_test,initial_amount = initial_investment,hmax = 5000,
-#                                 out_of_cash_penalty = 0,
-#                                 cash_penalty_proportion=0.2,
-#                                 reward_scaling = 1,
-#                                 cache_indicator_data=False,
-#                                 daily_information_cols = information_cols,
-#                                 print_verbosity = 500, random_start = False)
-#
-# # this is our training env. It allows multiprocessing
-# env_train, _ = train_gym.get_sb_env()
-# env_trade, _ = test_gym.get_sb_env()
-#
-#
-# agent = DRLAgent(env = env_train)
-# model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
-#
-# model = agent.get_model(args.model,
-#                         model_kwargs = model_params,
-#                         verbose = 1)
-#
-# print('Training model')
-# model.learn(total_timesteps = train_steps,
-#             eval_env = env_trade,
-#             eval_freq = 250,
-#             log_interval = 1,
-#             tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-#             n_eval_episodes = 1)
-#
-# model.save(os.path.join(args.modeldir,modelName))
+env_train, _ = e_train_gym.get_sb_env()
+
+agent = DRLAgent(env = env_train)
+model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
+
+model = agent.get_model(args.model,
+                        model_kwargs = model_params,
+                        verbose = 1)
+
+print('Training model')
+model.learn(total_timesteps = train_steps,
+            log_interval = 1,
+            tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()))
+
+model.save(os.path.join(args.modeldir,modelName))

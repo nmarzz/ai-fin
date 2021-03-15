@@ -40,6 +40,7 @@ def get_dataset(datadir,data_type,start_date,end_date):
 
             print('Adding Indicators')
             processed = fe.preprocess_data(df)
+
             list_ticker = processed["tic"].unique().tolist()
             list_date = list(pd.date_range(processed['date'].min(),processed['date'].max()).astype(str))
             combination = list(itertools.product(list_date,list_ticker))
@@ -49,7 +50,7 @@ def get_dataset(datadir,data_type,start_date,end_date):
             processed_full = processed_full.sort_values(['date','tic'])
 
             processed_full = processed_full.fillna(0)
-            processed_full.to_csv(data_path)
+            processed.to_csv(data_path,index = False)
         else:
             raise ValueError('Need to add crypto data to data directory')
 
@@ -64,8 +65,20 @@ def get_dataset(datadir,data_type,start_date,end_date):
     if not (max_date >= end_date):
         warnings.warn('Latest possible start date is {}: You have chosen {}. The earlier date will be used'.format(max_date,end_date))
 
-    to_return = full_df[full_df['date'] >= start_date]
-    to_return = to_return[to_return['date'] <= end_date]
+    to_return = data_split(full_df,start_date,end_date)
 
 
     return to_return
+
+
+
+def data_split(df, start, end):
+    """
+    split the dataset into training or testing using date
+    :param data: (df) pandas dataframe, start, end
+    :return: (df) pandas dataframe
+    """
+    data = df[(df.date >= start) & (df.date < end)]
+    data = data.sort_values(["date", "tic"], ignore_index=True)
+    data.index = data.date.factorize()[0]
+    return data
