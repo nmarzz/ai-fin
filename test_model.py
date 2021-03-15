@@ -59,7 +59,7 @@ train_steps = args.train_steps
 modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,enddate)
 
 # get testing data
-data = utils.data_utils.get_train_dataset(args.datadir,args.data_type,args.start_date,args.end_date)
+data = utils.data_utils.get_dataset(args.datadir,args.data_type,args.start_date,args.end_date)
 
 # get model
 

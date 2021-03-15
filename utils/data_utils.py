@@ -8,16 +8,16 @@ import os
 from finrl.config import config
 from finrl.marketdata.yahoodownloader import YahooDownloader
 from finrl.preprocessing.preprocessors import FeatureEngineer
+import itertools
 
-
-def get_train_dataset(datadir,data_type,start_date,end_date):
+def get_dataset(datadir,data_type,start_date,end_date):
 
     if not data_type in ['dow30','crypto']:
         raise ValueError('Market type not supported')
 
 
 
-    data_path = os.path.join(datadir,data_type + '.csv')    
+    data_path = os.path.join(datadir,data_type + '.csv')
 
     if not os.path.exists(data_path):
         if data_type == 'dow30':
@@ -39,11 +39,17 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
 
 
             print('Adding Indicators')
-            df = fe.preprocess_data(df)
-            df['log_volume'] = np.log(df.volume*df.close)
-            df['change'] = (df.close-df.open)/df.close
-            df['daily_variance'] = (df.high-df.low)/df.close
-            df.to_csv(data_path,index = False)
+            processed = fe.preprocess_data(df)
+            list_ticker = processed["tic"].unique().tolist()
+            list_date = list(pd.date_range(processed['date'].min(),processed['date'].max()).astype(str))
+            combination = list(itertools.product(list_date,list_ticker))
+
+            processed_full = pd.DataFrame(combination,columns=["date","tic"]).merge(processed,on=["date","tic"],how="left")
+            processed_full = processed_full[processed_full['date'].isin(processed['date'])]
+            processed_full = processed_full.sort_values(['date','tic'])
+
+            processed_full = processed_full.fillna(0)
+            processed_full.to_csv(data_path,index = False)
         else:
             raise ValueError('Need to add crypto data to data directory')
 
@@ -53,9 +59,9 @@ def get_train_dataset(datadir,data_type,start_date,end_date):
     min_date = min(full_df['date'])
 
 
-    if not (min_date == start_date):
+    if not (min_date <= start_date):
         warnings.warn('Earliest possible start date is {}: You have chosen {}. The later date will be used'.format(min_date,start_date))
-    if not (max_date == end_date):
+    if not (max_date >= end_date):
         warnings.warn('Latest possible start date is {}: You have chosen {}. The earlier date will be used'.format(max_date,end_date))
 
     to_return = full_df[full_df['date'] >= start_date]

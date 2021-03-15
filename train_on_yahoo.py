@@ -21,6 +21,7 @@ from finrl.trade.backtest import backtest_stats, get_baseline, backtest_plot
 from pprint import pprint
 
 from utils.enviroments import StockTradingEnvV2
+from utils.data_utils import get_dataset
 import itertools
 import pyfolio
 
@@ -39,6 +40,8 @@ parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
+
+args.model = 'ppo'
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
 
@@ -61,71 +64,69 @@ stock_tickers = config.DOW_30_TICKER
 indicators = config.TECHNICAL_INDICATORS_LIST
 
 # Get data
-if os.path.exists(df_name):
-    df = pd.read_csv(df_name)
-else:
-
-    print('Getting Data: ')
-    df = YahooDownloader(start_date = startdate,
-                         end_date = enddate,
-                         ticker_list = stock_tickers).fetch_data()
-
-    fe = FeatureEngineer(
-                    use_technical_indicator=True,
-                    tech_indicator_list = indicators,
-                    use_turbulence=True,
-                    user_defined_feature = False)
-
-    print('Adding Indicators')
-    df = fe.preprocess_data(df)
-    df['log_volume'] = np.log(df.volume*df.close)
-    df['change'] = (df.close-df.open)/df.close
-    df['daily_variance'] = (df.high-df.low)/df.close
-    df.to_csv(df_name,index = False)
+df_train = get_dataset(args.datadir,'dow30',args.start_date,args.split_date)
+df_test = get_dataset(args.datadir,'dow30',args.split_date,args.end_date)
 
 
-# Now define the training enviroment
-df_train = data_split(df, startdate,'2019-01-01')
-df_test = data_split(df, '2019-01-01','2021-01-01')
-
-information_cols = ['daily_variance', 'change', 'log_volume', 'close','day',
-                    'macd', 'rsi_30', 'cci_30', 'dx_30', 'turbulence']
-
-initial_investment = 1e6
-train_gym = StockTradingEnv(df = df_train,initial_amount = initial_investment,hmax = 5000,
-                                out_of_cash_penalty = 0,
-                                cache_indicator_data=False,
-                                cash_penalty_proportion=0.2,
-                                reward_scaling=1,
-                                daily_information_cols = information_cols,
-                                print_verbosity = 500, random_start = True)
-
-test_gym = StockTradingEnv(df = df_test,initial_amount = initial_investment,hmax = 5000,
-                                out_of_cash_penalty = 0,
-                                cash_penalty_proportion=0.2,
-                                reward_scaling = 1,
-                                cache_indicator_data=False,
-                                daily_information_cols = information_cols,
-                                print_verbosity = 500, random_start = False)
-
-# this is our training env. It allows multiprocessing
-env_train, _ = train_gym.get_sb_env()
-env_trade, _ = test_gym.get_sb_env()
+stock_dimension = len(df_train.tic.unique())
+state_space = 1 + 2*stock_dimension + len(config.TECHNICAL_INDICATORS_LIST)*stock_dimension
+print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
 
-agent = DRLAgent(env = env_train)
-model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
+env_kwargs = {
+    "hmax": 100,
+    "initial_amount": 1000000,
+    "buy_cost_pct": 0.001,
+    "sell_cost_pct": 0.001,
+    "state_space": state_space,
+    "stock_dim": stock_dimension,
+    "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
+    "action_space": stock_dimension,
+    "reward_scaling": 1e-4
 
-model = agent.get_model(args.model,
-                        model_kwargs = model_params,
-                        verbose = 1)
+}
 
-print('Training model')
-model.learn(total_timesteps = train_steps,
-            eval_env = env_trade,
-            eval_freq = 250,
-            log_interval = 1,
-            tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-            n_eval_episodes = 1)
+e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
 
-model.save(os.path.join(args.modeldir,modelName))
+#
+# information_cols = ['daily_variance', 'change', 'log_volume', 'close','day',
+#                     'macd', 'rsi_30', 'cci_30', 'dx_30', 'turbulence']
+#
+# initial_investment = 1e6
+# train_gym = StockTradingEnv(df = df_train,initial_amount = initial_investment,hmax = 5000,
+#                                 out_of_cash_penalty = 0,
+#                                 cache_indicator_data=False,
+#                                 cash_penalty_proportion=0.2,
+#                                 reward_scaling=1,
+#                                 daily_information_cols = information_cols,
+#                                 print_verbosity = 500, random_start = True)
+#
+# test_gym = StockTradingEnv(df = df_test,initial_amount = initial_investment,hmax = 5000,
+#                                 out_of_cash_penalty = 0,
+#                                 cash_penalty_proportion=0.2,
+#                                 reward_scaling = 1,
+#                                 cache_indicator_data=False,
+#                                 daily_information_cols = information_cols,
+#                                 print_verbosity = 500, random_start = False)
+#
+# # this is our training env. It allows multiprocessing
+# env_train, _ = train_gym.get_sb_env()
+# env_trade, _ = test_gym.get_sb_env()
+#
+#
+# agent = DRLAgent(env = env_train)
+# model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
+#
+# model = agent.get_model(args.model,
+#                         model_kwargs = model_params,
+#                         verbose = 1)
+#
+# print('Training model')
+# model.learn(total_timesteps = train_steps,
+#             eval_env = env_trade,
+#             eval_freq = 250,
+#             log_interval = 1,
+#             tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+#             n_eval_episodes = 1)
+#
+# model.save(os.path.join(args.modeldir,modelName))
