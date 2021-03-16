@@ -68,8 +68,6 @@ indicators = config.TECHNICAL_INDICATORS_LIST
 
 # Get data
 df_train = get_dataset(args.datadir,'dow30',args.start_date,args.split_date)
-
-
 df_test = get_dataset(args.datadir,'dow30',args.split_date,args.end_date)
 
 stock_dimension = len(df_train.tic.unique())
@@ -90,8 +88,10 @@ env_kwargs = {
 }
 
 e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
+e_trade_gym = StockTradingEnv(df = df_test, **env_kwargs)
 
 env_train, _ = e_train_gym.get_sb_env()
+env_trade,_ = e_trade_gym.get_sb_env()
 
 agent = DRLAgent(env = env_train)
 model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
@@ -101,13 +101,12 @@ model = agent.get_model(args.model,
                         verbose = 1)
 
 print('Training model')
-# model.learn(total_timesteps = train_steps,
-#             log_interval = 1,
-#             tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()))
 
 trained_model = agent.train_model(model = model,
                                   tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-                                  total_timesteps = train_steps
+                                  total_timesteps = train_steps,
+                                  eval_env = e_trade_gym,
+                                  n_eval_episodes = 10
                                   )
 
 trained_model.save(os.path.join(args.modeldir,modelName))
