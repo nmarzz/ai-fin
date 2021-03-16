@@ -1,8 +1,6 @@
 # TODO: Automate model selection better
 # Set up pipeline into ipynb notebook for backtesting with pyfolio
 
-
-
 import argparse
 import sys
 import os
@@ -33,22 +31,17 @@ import pyfolio
 
 
 
-parser = argparse.ArgumentParser(description='Training RL Stock Traders')
-parser.add_argument('--model', type=str, metavar='MOD',
-                    help='Options [ppo,ddpg,a2c,td3,sac]')
+parser = argparse.ArgumentParser(description='Test a RL Stock Trader')
 parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
 parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
 parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--split-date',type = str,default = '2019-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--end-date',type = str,default = '2021-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
+parser.add_argument('--modelname',type = str, metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
-
-
-if not args.model in ['ppo','ddpg','a2c','td3','sac']:
-    raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
 
 
 
@@ -62,7 +55,6 @@ startdate = args.start_date
 splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
-modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,splitdate)
 df_name = os.path.join(args.datadir,'dow30_start{}_end{}.csv'.format(startdate,enddate))
 
 stock_tickers = config.DOW_30_TICKER
@@ -90,24 +82,56 @@ env_kwargs = {
 }
 
 e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
-e_trade_gym = StockTradingEnv(df = df_test, **env_kwargs)
 
 env_train, _ = e_train_gym.get_sb_env()
-env_trade,_ = e_trade_gym.get_sb_env()
+
 
 agent = DRLAgent(env = env_train)
+
+args.model = 'ppo'
 model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
 
 model = agent.get_model(args.model,
                         model_kwargs = model_params,
                         verbose = 1)
 
-print('Training model')
+print('Testing model')
 
-trained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-                            total_timesteps = train_steps,
-                            eval_env = e_trade_gym,
-                            n_eval_episodes = 10
-                        )
+args.modelname = 'models/models/ppo_dow30_steps15000_start2009-01-01_end2019-01-01.model'
+trained_model = model.load(args.modelname)
 
-trained_model.save(os.path.join(args.modeldir,modelName))
+
+e_trade_gym = StockTradingEnv(df = df_test,turbulence_threshold = 329, **env_kwargs)
+df_account_value, df_actions = DRLAgent.DRL_prediction(
+    model=trained_model,
+    environment = e_trade_gym)
+
+
+print(df_account_value.head())
+
+import matplotlib.pyplot as plt
+import matplotlib
+
+dji = YahooDownloader(
+            start_date=args.split_date, end_date=args.end_date, ticker_list=['^DJI']
+        ).fetch_data()
+
+
+dates_rl = matplotlib.dates.date2num(df_account_value['date'])
+dates_base = matplotlib.dates.date2num(dji['date'])
+
+
+print(df_actions.head(10))
+
+
+print('DJI at 0')
+print(dji['close'][0])
+
+
+plt.plot_date(dates_rl,df_account_value['account_value'],'-')
+plt.plot_date(dates_base,dji['close'] * 42.8334494,'-')
+plt.legend(['RL','DJI'])
+plt.title('PPO model trained from 2010-2019')
+plt.ylabel('Account Value')
+plt.savefig('AFIG.png')
+print(df_actions.head(20))
