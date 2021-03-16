@@ -102,11 +102,10 @@ model = agent.get_model(args.model,
 
 print('Training model')
 
-trained_model = agent.train_model(model = model,
-                                  tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-                                  total_timesteps = train_steps,
-                                  eval_env = e_trade_gym,
-                                  n_eval_episodes = 10
-                                  )
+trained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+                            total_timesteps = train_steps,
+                            eval_env = e_trade_gym,
+                            n_eval_episodes = 10
+                        )
 
 trained_model.save(os.path.join(args.modeldir,modelName))
