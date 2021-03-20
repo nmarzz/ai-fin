@@ -41,7 +41,7 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 - [Dual Attention Model Git](https://github.com/Seanny123/da-rnn)  
 - [Understandable RL algo implementations](https://github.com/higgsfield/RL-Adventure-2)
 
-
+## Tutorials
 
 ## Propostions
 
