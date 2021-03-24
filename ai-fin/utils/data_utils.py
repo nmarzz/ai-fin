@@ -12,7 +12,7 @@ import itertools
 
 def get_dataset(datadir,data_type,start_date,end_date):
 
-    if not data_type in ['dow30','crypto']:
+    if not data_type in ['dow29','crypto']:
         raise ValueError('Market type not supported')
 
 
@@ -20,9 +20,9 @@ def get_dataset(datadir,data_type,start_date,end_date):
     data_path = os.path.join(datadir,data_type + '.csv')
 
     if not os.path.exists(data_path):
-        if data_type == 'dow30':
+        if data_type == 'dow29':
             # If we don't have the data, we can download dow data from yahoo finance
-            stock_tickers = config.DOW_30_TICKER
+            stock_tickers = config.DOW_30_TICKER_MINUS_VISA
             indicators = config.TECHNICAL_INDICATORS_LIST
             print('Getting Data: ')
             df = YahooDownloader(start_date = '2000-01-01',
