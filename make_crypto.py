@@ -12,7 +12,7 @@ from finrl.preprocessing.preprocessors import FeatureEngineer
 
 indicators = config.TECHNICAL_INDICATORS_LIST
 
-df = pd.read_csv('data/crypto.csv')
+df = pd.read_csv('crypto-markets_top30.csv')
 
 fe = FeatureEngineer(
                 use_technical_indicator=True,
