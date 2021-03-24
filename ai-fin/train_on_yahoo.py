@@ -46,6 +46,10 @@ parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
+args.model = 'a2c'
+args.train_steps = 5
+
+args.start_date = '2000-01-01'
 
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
@@ -62,15 +66,15 @@ startdate = args.start_date
 splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
-modelName = '{}_dow30_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,splitdate)
-df_name = os.path.join(args.datadir,'dow30_start{}_end{}.csv'.format(startdate,enddate))
+modelName = '{}_dow29_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,splitdate)
+df_name = os.path.join(args.datadir,'dow29_start{}_end{}.csv'.format(startdate,enddate))
 
-stock_tickers = config.DOW_30_TICKER
+stock_tickers = config.DOW_30_TICKER_MINUS_VISA
 indicators = config.TECHNICAL_INDICATORS_LIST
 
 # Get data
-df_train = get_dataset(args.datadir,'dow30',args.start_date,args.split_date)
-df_test = get_dataset(args.datadir,'dow30',args.split_date,args.end_date)
+df_train = get_dataset(args.datadir,'dow29',args.start_date,args.split_date)
+df_test = get_dataset(args.datadir,'dow29',args.split_date,args.end_date)
 
 stock_dimension = len(df_train.tic.unique())
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
@@ -89,11 +93,13 @@ env_kwargs = {
 
 }
 
-e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
 e_trade_gym = StockTradingEnv(df = df_test, **env_kwargs)
+e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
 
-env_train, _ = e_train_gym.get_sb_env()
+
 env_trade,_ = e_trade_gym.get_sb_env()
+env_train, _ = e_train_gym.get_sb_env()
+
 
 agent = DRLAgent(env = env_train)
 model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
