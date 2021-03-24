@@ -2,6 +2,10 @@
 
 A repo for our COMP 598 project exploring applications of deep learning to finance.
 
+## About 'finrl' 
+
+The 'finrl' folder is a modified version of the [FinRL-Library](https://github.com/AI4Finance-LLC/FinRL-Library) by Liu, Xiao-Yang and Yang, Hongyang and Chen, Qian and Zhang, Runjia and Yang, Liuqing and Xiao, Bowen and Wang, Christina Dan. The work contained therein is (with the exception of slight modifications, bug fixes) not our original work. 
+
 
 ## Data
 
