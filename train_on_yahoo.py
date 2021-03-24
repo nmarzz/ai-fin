@@ -36,17 +36,13 @@ parser.add_argument('--model', type=str, metavar='MOD',
 parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
 parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
 parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--split-date',type = str,default = '2019-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--split-date',type = str,default = '2018-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--end-date',type = str,default = '2021-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 
 args = parser.parse_args()
 
-args.model = 'a2c'
-args.train_steps = 5
-
-args.start_date = '2000-01-01'
 
 if not args.model in ['ppo','ddpg','a2c','td3','sac']:
     raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
