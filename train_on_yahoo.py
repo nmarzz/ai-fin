@@ -74,7 +74,7 @@ state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
 env_kwargs = {
-    "hmax": 100,
+    "hmax": 500,
     "initial_amount": 1000000,
     "buy_cost_pct": 0.001,
     "sell_cost_pct": 0.001,
