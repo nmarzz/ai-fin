@@ -2,7 +2,6 @@
 # Set up pipeline into ipynb notebook for backtesting with pyfolio
 
 
-
 import argparse
 import sys
 import os

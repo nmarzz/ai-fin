@@ -296,7 +296,7 @@ class StockTradingEnv(gym.Env):
                 state = [self.initial_amount] + \
                          self.data.close.values.tolist() + \
                          [0]*self.stock_dim  + \
-                         sum([self.data[tech].values.tolist() for tech in self.tech_indicator_list ], [])                                
+                         sum([self.data[tech].values.tolist() for tech in self.tech_indicator_list ], [])
             else:
                 # for single stock
                 state = [self.initial_amount] + \
@@ -394,7 +394,6 @@ class StockTradingEnv(gym.Env):
 
 
     def get_sb_env(self):
-        e = DummyVecEnv([lambda: self])
-        print(len(self.state))
+        e = DummyVecEnv([lambda: self])    
         obs = e.reset()
         return e, obs
