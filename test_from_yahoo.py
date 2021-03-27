@@ -4,7 +4,7 @@
 import argparse
 import sys
 import os
-sys.path.append("../FinRL-Library")
+
 
 import pandas as pd
 import numpy as np
@@ -55,16 +55,16 @@ startdate = args.start_date
 splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
-df_name = os.path.join(args.datadir,'dow30_start{}_end{}.csv'.format(startdate,enddate))
 
-stock_tickers = config.DOW_30_TICKER
+stock_tickers = config.DOW_30_TICKER_MINUS_VISA
 indicators = config.TECHNICAL_INDICATORS_LIST
 
 # Get data
-df_train = get_dataset(args.datadir,'dow30',args.start_date,args.split_date)
-df_test = get_dataset(args.datadir,'dow30',args.split_date,args.end_date)
+df_train = get_dataset(args.datadir,'dow29',args.start_date,args.split_date)
+df_test = get_dataset(args.datadir,'dow29',args.split_date,args.end_date)
 
 stock_dimension = len(df_train.tic.unique())
+
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
@@ -95,7 +95,7 @@ model = agent.get_model(args.model,
                         model_kwargs = model_params,
                         verbose = 1)
 
-print('Testing model')
+print('Testing model')s
 
 args.modelname = 'models/models/ppo_dow30_steps15000_start2009-01-01_end2019-01-01.model'
 trained_model = model.load(args.modelname)
@@ -115,7 +115,6 @@ import matplotlib
 dji = YahooDownloader(
             start_date=args.split_date, end_date=args.end_date, ticker_list=['^DJI']
         ).fetch_data()
-
 
 dates_rl = matplotlib.dates.date2num(df_account_value['date'])
 dates_base = matplotlib.dates.date2num(dji['date'])

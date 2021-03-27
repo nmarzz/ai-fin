@@ -394,6 +394,7 @@ class StockTradingEnv(gym.Env):
 
 
     def get_sb_env(self):
-        e = DummyVecEnv([lambda: self])    
+        e = DummyVecEnv([lambda: self])
+        print(self.state)
         obs = e.reset()
         return e, obs

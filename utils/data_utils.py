@@ -16,7 +16,6 @@ def get_dataset(datadir,data_type,start_date,end_date):
         raise ValueError('Market type not supported')
 
 
-
     data_path = os.path.join(datadir,data_type + '.csv')
 
     if not os.path.exists(data_path):

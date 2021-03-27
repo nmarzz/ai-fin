@@ -1,7 +1,6 @@
 # TODO: Automate model selection better
 # Set up pipeline into ipynb notebook for backtesting with pyfolio
 
-
 import argparse
 import sys
 import os
@@ -20,7 +19,7 @@ from finrl.model.models import DRLAgent,DRLEnsembleAgent
 from finrl.trade.backtest import backtest_stats, get_baseline, backtest_plot
 from pprint import pprint
 
-from utils.enviroments import StockTradingEnvV2
+# from utils.enviroments import StockTradingEnvV2
 from utils.data_utils import get_dataset
 
 import sys
@@ -69,6 +68,7 @@ indicators = config.TECHNICAL_INDICATORS_LIST
 df_train = get_dataset(args.datadir,'dow29',args.start_date,args.split_date)
 df_test = get_dataset(args.datadir,'dow29',args.split_date,args.end_date)
 
+
 stock_dimension = len(df_train.tic.unique())
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
@@ -83,7 +83,6 @@ env_kwargs = {
     "tech_indicator_list": indicators,
     "action_space": stock_dimension,
     "reward_scaling": 1e-4
-
 }
 
 e_trade_gym = StockTradingEnv(df = df_test, **env_kwargs)
