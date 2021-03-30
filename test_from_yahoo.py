@@ -27,15 +27,17 @@ from pprint import pprint
 from utils.enviroments import StockTradingEnvV2
 from utils.data_utils import get_dataset
 from utils.preprocess import get_model_info_from_path
+from utils.models import EnsembleModel
 
 
 
 data_dir = 'data'
-model_path = 'models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model'
-dates = re.findall(r'\d{4}-\d{2}-\d{2}', model_path)
-start_date,split_date,data_type ,model = get_model_info_from_path(model_path)
+# model_paths = ['models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ddpg_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ppo_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/sac_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/td3_dow29_steps100000_start2000-01-01_end2018-01-01.model']
+model_paths = 'models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model'
+start_date,split_date,data_type ,model = get_model_info_from_path(model_paths)
 
-end_date = '2020-12-01' # Model is tested from split_date to end_date
+end_date = '2020-12-31' # Model is tested from split_date to end_date
+
 
 # Get data
 df = get_dataset(data_dir,'dow29',split_date,end_date)
@@ -61,18 +63,26 @@ env_kwargs = {
 }
 
 test_gym_env = StockTradingEnv(df = df,turbulence_threshold = 329, **env_kwargs)
-
 agent = DRLAgent(env = test_gym_env)
-model_params = config.__dict__[f"{model.upper()}_PARAMS"]
 
-trained_model = agent.get_model(model,
-                        model_kwargs = model_params,
-                        verbose = 0).load(model_path)
+
+if model == 'ensemble':
+    trained_model = EnsembleModel(test_gym_env,model_paths,'binaverage')
+else:
+    model_params = config.__dict__[f"{model.upper()}_PARAMS"]
+
+    trained_model = agent.get_model(model,
+                            model_kwargs = model_params,
+                            verbose = 0).load(model_paths)
+
+
 
 print('Testing...')
 df_account_value, df_actions = DRLAgent.DRL_prediction(
     model=trained_model,
     environment = test_gym_env)
+
+
 
 print('Comparing to DJI')
 dji = YahooDownloader(
@@ -81,8 +91,6 @@ dji = YahooDownloader(
 dates_rl = matplotlib.dates.date2num(df_account_value['date'])
 dates_base = matplotlib.dates.date2num(dji['date'])
 
-print('DJI at 0')
-print(dji['close'][0])
 
 init_dji_shares = 1000000/dji['close'][0]
 

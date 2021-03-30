@@ -11,11 +11,11 @@ from stable_baselines3 import DDPG
 
 MODELS = {"a2c": A2C, "ddpg": DDPG, "td3": TD3, "sac": SAC, "ppo": PPO}
 
-class Ensemble_Model:
+class EnsembleModel:
 
     def __init__(self,env,model_paths,voting_type):
         self.env = env
-        self.models = self.init_models(model_paths)
+        self.init_models(model_paths)
         self.voting_type = voting_type
 
         voting_styles = ['average','binaverage']
@@ -72,4 +72,7 @@ class Ensemble_Model:
 
             model_params = config.__dict__[f"{model_name.upper()}_PARAMS"]
 
-            model = MODELS[model_name](policy="MlpPolicy",env = None,**model_params)
+            model = MODELS[model_name](policy="MlpPolicy",env = self.env,**model_params)
+            models.append(model)
+
+        self.models = models

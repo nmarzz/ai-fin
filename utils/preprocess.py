@@ -20,18 +20,28 @@ def get_model_info_from_path(model_path):
     '''
     error_msg = 'Could not parse model data from model name. Please manually enter the values'
 
+    model = None
+    if type(model_path) is list:
+        if len(model_path) > 1:
+            model = 'ensemble'
+            model_path = model_path[0] # Just get date and data info from first model in list
+        else:
+            for m in config.AVAILABLE_MODELS:
+                if re.search(m,model_path):
+                    model = m
+            model_path = model_path[0] # Just get date and data info from first model in list
+    else:
+        for m in config.AVAILABLE_MODELS:
+            if re.search(m,model_path):
+                model = m
+
+
+
+
     data_type = None
-
-    if not type(model_path) is list:
-        # If list, get ensemble model
-        model = None
-        for d in config.SUPPORTED_DATA:
-            if re.search(d,model_path):
-                data_type = d
-
-    for m in config.AVAILABLE_MODELS:
-        if re.search(m,model_path):
-            model = m
+    for d in config.SUPPORTED_DATA:
+        if re.search(d,model_path):
+            data_type = d
 
     dates = re.findall(r'\d{4}-\d{2}-\d{2}', model_path)
 
