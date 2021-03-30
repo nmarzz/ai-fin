@@ -6,7 +6,7 @@ STARTDATE=$2
 
 for MODEL in ppo ddpg a2c td3 sac
 do
-  python train_on_yahoo.py\
+  python train_model.py\
   --model $MODEL\
   --train-steps $TRAINSTEPS\
   --start-date $STARTDATE
