@@ -12,7 +12,7 @@ import itertools
 
 def get_dataset(datadir,data_type,start_date,end_date):
 
-    if not data_type in ['dow29','crypto']:
+    if not data_type in config.SUPPORTED_DATA:
         raise ValueError('Market type not supported')
 
 

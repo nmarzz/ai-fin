@@ -16,11 +16,13 @@ import os
 TRAINED_MODEL_DIR = "trained_models"
 # DATASET_DIR = PACKAGE_ROOT / "data"
 
+
+
 # data
 # TRAINING_DATA_FILE = "data/ETF_SPY_2009_2020.csv"
 # TURBULENCE_DATA = "data/dow30_turbulence_index.csv"
 # TESTING_DATA_FILE = "test.csv"
-
+SUPPORTED_DATA = ['dow29','crypto']
 # now = datetime.datetime.now()
 # TRAINED_MODEL_DIR = f"trained_models/{now}"
 DATA_SAVE_DIR = "datasets"
@@ -45,6 +47,9 @@ TECHNICAL_INDICATORS_LIST = ["macd","boll_ub","boll_lb","rsi_30", "cci_30", "dx_
 
 
 ## Model Parameters
+
+AVAILABLE_MODELS = ['ppo','ddpg','a2c','td3','sac']
+
 A2C_PARAMS = {"n_steps": 5, "ent_coef": 0.01, "learning_rate": 0.0007}
 PPO_PARAMS = {
     "n_steps": 2048,

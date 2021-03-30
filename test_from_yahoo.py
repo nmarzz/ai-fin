@@ -9,6 +9,10 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+import itertools
+import pyfolio
+import re
 import datetime
 
 from finrl.config import config
@@ -22,54 +26,30 @@ from pprint import pprint
 
 from utils.enviroments import StockTradingEnvV2
 from utils.data_utils import get_dataset
-
-import sys
-sys.path.append("../FinRL-Library")
-
-import itertools
-import pyfolio
+from utils.preprocess import get_model_info_from_path
 
 
 
-parser = argparse.ArgumentParser(description='Test a RL Stock Trader')
-parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
-parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
-parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--split-date',type = str,default = '2019-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--end-date',type = str,default = '2021-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
-parser.add_argument('--modelname',type = str, metavar = 'STR')
-parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
+data_dir = 'data'
+model_path = 'models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model'
+dates = re.findall(r'\d{4}-\d{2}-\d{2}', model_path)
+start_date,split_date,data_type ,model = get_model_info_from_path(model_path)
 
-args = parser.parse_args()
-
-
-
-print('Arguments:')
-for p in vars(args).items():
-    print('  ',p[0]+': ',p[1])
-print('\n')
-
-
-startdate = args.start_date
-splitdate = args.split_date
-enddate = args.end_date
-train_steps = args.train_steps
-
-stock_tickers = config.DOW_30_TICKER_MINUS_VISA
-indicators = config.TECHNICAL_INDICATORS_LIST
+end_date = '2020-12-01' # Model is tested from split_date to end_date
 
 # Get data
-df_train = get_dataset(args.datadir,'dow29',args.start_date,args.split_date)
-df_test = get_dataset(args.datadir,'dow29',args.split_date,args.end_date)
+df = get_dataset(data_dir,'dow29',split_date,end_date)
 
-stock_dimension = len(df_train.tic.unique())
+print(f'Testing from {start_date} to {end_date}')
+
+stock_dimension = len(df.tic.unique())
+indicators = config.TECHNICAL_INDICATORS_LIST
 
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
 env_kwargs = {
-    "hmax": 100,
+    "hmax": 500,
     "initial_amount": 1000000,
     "buy_cost_pct": 0.001,
     "sell_cost_pct": 0.001,
@@ -80,57 +60,36 @@ env_kwargs = {
     "reward_scaling": 1e-4
 
 }
+test_gym_env = StockTradingEnv(df = df,turbulence_threshold = 329, **env_kwargs)
 
-e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
+agent = DRLAgent(env = test_gym_env)
+model_params = config.__dict__[f"{model.upper()}_PARAMS"]
 
-env_train, _ = e_train_gym.get_sb_env()
-
-
-agent = DRLAgent(env = env_train)
-
-args.model = 'ppo'
-model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
-
-model = agent.get_model(args.model,
+trained_model = agent.get_model(model,
                         model_kwargs = model_params,
-                        verbose = 1)
+                        verbose = 0).load(model_path)
 
-print('Testing model')s
-
-args.modelname = 'models/models/ppo_dow30_steps15000_start2009-01-01_end2019-01-01.model'
-trained_model = model.load(args.modelname)
-
-
-e_trade_gym = StockTradingEnv(df = df_test,turbulence_threshold = 329, **env_kwargs)
+print('Testing...')
 df_account_value, df_actions = DRLAgent.DRL_prediction(
     model=trained_model,
-    environment = e_trade_gym)
+    environment = test_gym_env)
 
-
-print(df_account_value.head())
-
-import matplotlib.pyplot as plt
-import matplotlib
-
+print('Comparing to DJI')
 dji = YahooDownloader(
-            start_date=args.split_date, end_date=args.end_date, ticker_list=['^DJI']
+            start_date=split_date, end_date=end_date, ticker_list=['^DJI']
         ).fetch_data()
-
 dates_rl = matplotlib.dates.date2num(df_account_value['date'])
 dates_base = matplotlib.dates.date2num(dji['date'])
-
-
-print(df_actions.head(10))
-
 
 print('DJI at 0')
 print(dji['close'][0])
 
+init_dji_shares = 1000000/dji['close'][0]
+
 
 plt.plot_date(dates_rl,df_account_value['account_value'],'-')
-plt.plot_date(dates_base,dji['close'] * 42.8334494,'-')
+plt.plot_date(dates_base,dji['close'] * init_dji_shares,'-')
 plt.legend(['RL','DJI'])
-plt.title('PPO model trained from 2010-2019')
+plt.title(f'{model} model trained from {start_date}-{split_date}')
 plt.ylabel('Account Value')
-plt.savefig('AFIG.png')
-print(df_actions.head(20))
+plt.savefig(f'{model}_vs_dji_{split_date}_{end_date}.png')
