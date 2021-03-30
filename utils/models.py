@@ -1,10 +1,21 @@
 import numpy as np
+from finrl.config import config
+import re
 
+from stable_baselines3 import A2C
+from stable_baselines3 import PPO
+from stable_baselines3 import TD3
+from stable_baselines3 import SAC
+from stable_baselines3 import DDPG
+
+
+MODELS = {"a2c": A2C, "ddpg": DDPG, "td3": TD3, "sac": SAC, "ppo": PPO}
 
 class Ensemble_Model:
 
-    def __init__(self,models,voting_type):
-        self.models = models
+    def __init__(self,env,model_paths,voting_type):
+        self.env = env
+        self.models = self.init_models(model_paths)
         self.voting_type = voting_type
 
         voting_styles = ['average','binaverage']
@@ -48,3 +59,17 @@ class Ensemble_Model:
         action = self.vote(actions)
 
         return action, None # None is a dummy for compatibility
+
+    def init_models(self,model_paths):
+        models = []
+        for path in model_paths:
+            model_name = None
+            for m in config.AVAILABLE_MODELS:
+                if re.search(m,path):
+                    model_name = m
+            if model_name is None:
+                raise ValueError(f'Model path does not contain model name: {path}')
+
+            model_params = config.__dict__[f"{model_name.upper()}_PARAMS"]
+
+            model = MODELS[model_name](policy="MlpPolicy",env = None,**model_params)
