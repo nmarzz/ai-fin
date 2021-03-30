@@ -58,7 +58,7 @@ startdate = args.start_date
 splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
-modelName = '{}_dow29_steps{}_start{}_end{}.model'.format(args.model,train_steps,startdate,splitdate)
+modelName = '{}_dow29_steps{}_start{}_end{}_rs0.6.model'.format(args.model,train_steps,startdate,splitdate)
 df_name = os.path.join(args.datadir,'dow29_start{}_end{}.csv'.format(startdate,enddate))
 
 stock_tickers = config.DOW_30_TICKER_MINUS_VISA
@@ -82,7 +82,7 @@ env_kwargs = {
     "stock_dim": stock_dimension,
     "tech_indicator_list": indicators,
     "action_space": stock_dimension,
-    "reward_scaling": 1e-4
+    "reward_scaling": 0.6
 }
 
 e_trade_gym = StockTradingEnv(df = df_test, **env_kwargs)
