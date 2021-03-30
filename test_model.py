@@ -1,15 +1,18 @@
-# TODO:
-# Make data folder if not exist
-# Raise error or warning when data selection dates are not sharp
+# TODO: Automate model selection better
+# Set up pipeline into ipynb notebook for backtesting with pyfolio
 
 import argparse
 import sys
 import os
-sys.path.append("../FinRL-Library")
+
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+import itertools
+import pyfolio
+import re
 import datetime
 
 from finrl.config import config
@@ -22,158 +25,79 @@ from finrl.trade.backtest import backtest_stats, get_baseline, backtest_plot
 from pprint import pprint
 
 from utils.enviroments import StockTradingEnvV2
-import utils.data_utils
-import itertools
-import pyfolio
+from utils.data_utils import get_dataset
+from utils.preprocess import get_model_info_from_path
+from utils.models import EnsembleModel
 
 
 
-parser = argparse.ArgumentParser(description='Testing RL Stock Traders')
-parser.add_argument('--model', type=str, metavar='MOD',
-                    help='Options [ppo,ddpg,a2c,td3,sac]')
-parser.add_argument('--data-type',type = str,metavar = 'DTYPE',help = 'one of: dow30 or crypto')
-parser.add_argument('--train-steps',type = int,default = 5000, metavar = 'TS')
-parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
-parser.add_argument('--start-date',type = str,default = '2009-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--end-date',type = str,default = '2021-01-19', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
-parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
+data_dir = 'data'
+# model_paths = ['models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ddpg_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ppo_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/sac_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/td3_dow29_steps100000_start2000-01-01_end2018-01-01.model']
+model_paths = 'models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model'
+start_date,split_date,data_type ,model = get_model_info_from_path(model_paths)
 
-args = parser.parse_args()
+end_date = '2020-12-31' # Model is tested from split_date to end_date
 
 
-if not args.model in ['ppo','ddpg','a2c','td3','sac']:
-    raise ValueError('Invalid model choice: must be one of [\'ppo\',\'ddpg\',\'a2c\',\'td3\',\'sac\']')
-if not args.data_type in ['dow30','crypto']:
-    raise ValueError('Invalid data choice: must be one of [\'dow30\',\'crypto\']')
+# Get data
+df = get_dataset(data_dir,data_type,split_date,end_date)
 
-print('Arguments:')
-for p in vars(args).items():
-    print('  ',p[0]+': ',p[1])
-print('\n')
+print(f'Testing from {start_date} to {end_date}')
 
+stock_dimension = len(df.tic.unique())
+indicators = config.TECHNICAL_INDICATORS_LIST
 
-startdate = args.start_date
-enddate = args.end_date
-train_steps = args.train_steps
-modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,enddate)
+state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
+print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
-# get testing data
-data = utils.data_utils.get_dataset(args.datadir,args.data_type,args.start_date,args.end_date)
+env_kwargs = {
+    "hmax": 500,
+    "initial_amount": 1000000,
+    "buy_cost_pct": 0.001,
+    "sell_cost_pct": 0.001,
+    "state_space": state_space,
+    "stock_dim": stock_dimension,
+    "tech_indicator_list": indicators,
+    "action_space": stock_dimension,
+    "reward_scaling": 1e-4
+}
 
-# get model
-
-# make testing enviroment
-
-# test model
-
-# save testing results
-
+test_gym_env = StockTradingEnv(df = df,turbulence_threshold = 329, **env_kwargs)
+agent = DRLAgent(env = test_gym_env)
 
 
+if model == 'ensemble':
+    trained_model = EnsembleModel(test_gym_env,model_paths,'binaverage')
+else:
+    model_params = config.__dict__[f"{model.upper()}_PARAMS"]
 
-# # Get data
-# if os.path.exists(df_name):
-#     df = pd.read_csv(df_name)
-# else:
-#     print('Getting Data: ')
-#     df = YahooDownloader(start_date = startdate,
-#                          end_date = enddate,
-#                          ticker_list = stock_tickers).fetch_data()
-#
-#     fe = FeatureEngineer(
-#                     use_technical_indicator=True,
-#                     tech_indicator_list = indicators,
-#                     use_turbulence=True,
-#                     user_defined_feature = False)
-#
-#     print('Adding Indicators')
-#     df = fe.preprocess_data(df)
-#     df['log_volume'] = np.log(df.volume*df.close)
-#     df['change'] = (df.close-df.open)/df.close
-#     df['daily_variance'] = (df.high-df.low)/df.close
-#     df.to_csv(df_name,index = False)
-#
-#
-# # Now define the training enviroment
-# df_train = data_split(df, startdate,splitdate)
-# df_test = data_split(df, splitdate,enddate)
-#
-# information_cols = ['daily_variance', 'change', 'log_volume', 'close','day',
-#                     'macd', 'rsi_30', 'cci_30', 'dx_30', 'turbulence']
-#
-# initial_investment = 1e6
-# train_gym = StockTradingEnvV2(df = df_train,initial_amount = initial_investment,hmax = 5000,
-#                                 out_of_cash_penalty = 0,
-#                                 cache_indicator_data=False,
-#                                 cash_penalty_proportion=0.2,
-#                                 reward_scaling=1,
-#                                 daily_information_cols = information_cols,
-#                                 print_verbosity = 500, random_start = True)
-#
-# test_gym = StockTradingEnvV2(df = df_test,initial_amount = initial_investment,hmax = 5000,
-#                                 out_of_cash_penalty = 0,
-#                                 cash_penalty_proportion=0.2,
-#                                 reward_scaling = 1,
-#                                 cache_indicator_data=False,
-#                                 daily_information_cols = information_cols,
-#                                 print_verbosity = 500, random_start = False)
-#
-# test_gym.seed(1331)
-#
-#
-#
-# # this is our training env. It allows multiprocessing
-# env_train, _ = train_gym.get_multiproc_env(n = n_cores)
-# env_trade, _ = test_gym.get_sb_env()
-#
-# agent = DRLAgent(env = env_train)
-#
-# ppo_params ={'n_steps': 256,
-#              'ent_coef': 0.01,
-#              'learning_rate': 0.00009,
-#              'batch_size': 512,
-#             'gamma': 0.99}
-# policy_kwargs = {
-#     "net_arch": [1024, 1024,1024, 1024,  1024],
-# }
-# model = agent.get_model("ppo",
-#                         model_kwargs = ppo_params,
-#                         policy_kwargs = policy_kwargs, verbose = 1)
-# model = model.load(modelName)
-#
-# ## Now we begin testing the model
-# df_account_value, df_actions = DRLAgent.DRL_prediction(model=model,environment = test_gym)
-# backtest_results = backtest_stats(account_value=df_account_value, value_col_name = 'total_assets')
-#
-# def backtest(account_values,baseline):
-#     pass
-#
-# baseline_ticker = "^DJI"
-# baseline_dji = YahooDownloader(
-#             start_date= startdate, end_date=enddate, ticker_list=[baseline_ticker]
-#         ).fetch_data()
-#
-# test_returns = get_daily_return(df_account_value, value_col_name='total_assets')
-# baseline_returns = get_daily_return(baseline_dji, value_col_name='close')
-#
-#
-#
-# # plt.plot(test_returns)
-# # plt.plot(baseline_returns)
-# # plt.legend(['us','dji'])
-# # plt.savefig("mygraph.png")
-#
-# test_returns.to_csv('f.csv')
-# baseline_returns.to_csv('me.csv')
-# #
-# # with pyfolio.plotting.plotting_context(context = "paper",font_scale=1.1):
-# #         pyfolio.create_full_tear_sheet(
-# #             returns=test_returns, benchmark_rets=baseline_returns, set_context=False
-# #         )
-#
-#
-# # backtest_plot(df_account_value,
-# #              baseline_ticker = '^DJI',
-# #              baseline_start = '2019-01-01',
-# #              baseline_end = '2021-01-01', value_col_name = 'total_assets')
+    trained_model = agent.get_model(model,
+                            model_kwargs = model_params,
+                            verbose = 0).load(model_paths)
+
+
+
+print('Testing...')
+df_account_value, df_actions = DRLAgent.DRL_prediction(
+    model=trained_model,
+    environment = test_gym_env)
+
+
+
+print('Comparing to DJI')
+dji = YahooDownloader(
+            start_date=split_date, end_date=end_date, ticker_list=['^DJI']
+        ).fetch_data()
+dates_rl = matplotlib.dates.date2num(df_account_value['date'])
+dates_base = matplotlib.dates.date2num(dji['date'])
+
+
+init_dji_shares = 1000000/dji['close'][0]
+
+
+plt.plot_date(dates_rl,df_account_value['account_value'],'-')
+plt.plot_date(dates_base,dji['close'] * init_dji_shares,'-')
+plt.legend(['RL','DJI'])
+plt.title(f'{model} model trained from {start_date}-{split_date}')
+plt.ylabel('Account Value')
+plt.savefig(f'imgs/{model}_vs_dji_{split_date}_{end_date}.png')
