@@ -58,8 +58,8 @@ env_kwargs = {
     "tech_indicator_list": indicators,
     "action_space": stock_dimension,
     "reward_scaling": 1e-4
-
 }
+
 test_gym_env = StockTradingEnv(df = df,turbulence_threshold = 329, **env_kwargs)
 
 agent = DRLAgent(env = test_gym_env)

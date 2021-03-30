@@ -21,10 +21,13 @@ def get_model_info_from_path(model_path):
     error_msg = 'Could not parse model data from model name. Please manually enter the values'
 
     data_type = None
-    model = None
-    for type in config.SUPPORTED_DATA:
-        if re.search(type,model_path):
-            data_type = type
+
+    if not type(model_path) is list:
+        # If list, get ensemble model
+        model = None
+        for d in config.SUPPORTED_DATA:
+            if re.search(d,model_path):
+                data_type = d
 
     for m in config.AVAILABLE_MODELS:
         if re.search(m,model_path):
@@ -37,6 +40,6 @@ def get_model_info_from_path(model_path):
     elif data_type is None:
         raise ValueError(error_msg)
     elif model is None:
-        raise ValueError(error_msg)
+        raise ValueError('Model type not supported')
 
     return dates[0],dates[1],data_type,model
