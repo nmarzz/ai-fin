@@ -106,7 +106,8 @@ class DRLAgent:
             n_actions = self.env.action_space.shape[-1]
             model_kwargs["action_noise"] = NOISE[model_kwargs["action_noise"]](
                 mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions)
-            )        
+            )
+
         model = MODELS[model_name](
             policy=policy,
             env=self.env,
