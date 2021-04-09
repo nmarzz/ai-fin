@@ -22,7 +22,7 @@ TRAINED_MODEL_DIR = "trained_models"
 # TRAINING_DATA_FILE = "data/ETF_SPY_2009_2020.csv"
 # TURBULENCE_DATA = "data/dow30_turbulence_index.csv"
 # TESTING_DATA_FILE = "test.csv"
-SUPPORTED_DATA = ['dow29','crypto']
+SUPPORTED_DATA = ['dow29','crypto','nas29']
 # now = datetime.datetime.now()
 # TRAINED_MODEL_DIR = f"trained_models/{now}"
 DATA_SAVE_DIR = "datasets"
@@ -273,6 +273,39 @@ NAS_100_TICKER = [
     "WLTW",
     "UAL",
 ]
+
+NAS_29_TICKER = [
+    "AMGN",
+    "AAPL",
+    "AMAT",
+    "INTC",
+    "PCAR",
+    "PAYX",
+    "MSFT",
+    "ADBE",
+    "CSCO",
+    "XLNX",
+    "QCOM",
+    "COST",
+    "SBUX",
+    "FISV",
+    "CTXS",
+    "INTU",
+    "AMZN",
+    "EBAY",
+    "BIIB",
+    "CHKP",
+    "GILD",
+    "NLOK",
+    "CMCSA",
+    "FAST",
+    "ADSK",
+    "CTSH",
+    "NVDA",
+    "GOOGL",
+    "ISRG"]
+
+
 
 # SP 500 constituents at 2019
 SP_500_TICKER = [
