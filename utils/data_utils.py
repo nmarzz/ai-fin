@@ -50,6 +50,38 @@ def get_dataset(datadir,data_type,start_date,end_date):
 
             processed_full = processed_full.fillna(0)
             processed.to_csv(data_path,index = False)
+
+        elif data_type == 'nas29':
+            # If we don't have the data, we can download dow data from yahoo finance
+            stock_tickers = config.NAS_29_TICKER
+            indicators = config.TECHNICAL_INDICATORS_LIST
+            print('Getting Data: ')
+            df = YahooDownloader(start_date = '2000-01-01',
+                                 end_date = '2021-01-01',
+                                 ticker_list = stock_tickers).fetch_data()
+
+            fe = FeatureEngineer(
+                            use_technical_indicator=True,
+                            tech_indicator_list = indicators,
+                            use_turbulence=True,
+                            user_defined_feature = False)
+
+
+
+
+            print('Adding Indicators')
+            processed = fe.preprocess_data(df)
+
+            list_ticker = processed["tic"].unique().tolist()
+            list_date = list(pd.date_range(processed['date'].min(),processed['date'].max()).astype(str))
+            combination = list(itertools.product(list_date,list_ticker))
+
+            processed_full = pd.DataFrame(combination,columns=["date","tic"]).merge(processed,on=["date","tic"],how="left")
+            processed_full = processed_full[processed_full['date'].isin(processed['date'])]
+            processed_full = processed_full.sort_values(['date','tic'])
+
+            processed_full = processed_full.fillna(0)
+            processed.to_csv(data_path,index = False)
         else:
             raise ValueError('Need to add crypto data to data directory')
 

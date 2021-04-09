@@ -39,9 +39,14 @@ parser.add_argument('--split-date',type = str,default = '2018-11-28', metavar = 
 parser.add_argument('--end-date',type = str,default = '2018-11-29', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
-parser.add_argument('--data_type',type = str,default = 'dow29',metavar = 'DTY')
+parser.add_argument('--data_type1',type = str,default = 'nas29',metavar = 'DTY')
+parser.add_argument('--data_type2',type = str,default = 'dow29',metavar = 'DTY')
 
 args = parser.parse_args()
+
+args.model = 'ppo'
+args.train_steps = 5
+
 
 if not args.model in config.AVAILABLE_MODELS:
     raise ValueError(f'Invalid model choice: must be one of {config.AVAILABLE_MODELS}')
@@ -57,15 +62,17 @@ startdate = args.start_date
 splitdate = args.split_date
 enddate = args.end_date
 train_steps = args.train_steps
-modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,splitdate)
+modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type1,train_steps,startdate,splitdate)
+
 
 indicators = config.TECHNICAL_INDICATORS_LIST
+
 # Get data
-df_train = get_dataset(args.datadir,args.data_type,args.start_date,args.split_date)
-df_test = get_dataset(args.datadir,args.data_type,args.split_date,args.end_date)
+df_train_pre = get_dataset(args.datadir,args.data_type1,args.start_date,args.split_date)
+df_test_pre = get_dataset(args.datadir,args.data_type1,args.split_date,args.end_date)
 
 
-stock_dimension = len(df_train.tic.unique())
+stock_dimension = len(df_train_pre.tic.unique())
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
@@ -83,15 +90,15 @@ env_kwargs = {
     "reward_scaling": 0.6
 }
 
-e_trade_gym = StockTradingEnv(df = df_test, **env_kwargs)
-e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
+e_trade_gym_pre = StockTradingEnv(df = df_test_pre, **env_kwargs)
+e_train_gym_pre = StockTradingEnv(df = df_train_pre, **env_kwargs)
 
 
-env_trade,_ = e_trade_gym.get_sb_env()
-env_train, _ = e_train_gym.get_sb_env()
+env_trade_pre,_ = e_trade_gym_pre.get_sb_env()
+env_train_pre, _ = e_train_gym_pre.get_sb_env()
 
 
-agent = DRLAgent(env = env_train)
+agent = DRLAgent(env = env_train_pre)
 model_params = config.__dict__[f"{args.model.upper()}_PARAMS"]
 
 model = agent.get_model(args.model,
@@ -100,10 +107,27 @@ model = agent.get_model(args.model,
 
 print('Training model')
 
-trained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+                            total_timesteps = train_steps,
+                            eval_env = e_trade_gym_pre,
+                            n_eval_episodes = 10
+                        )
+
+pretrained_model.save(os.path.join(args.modeldir,modelName))
+
+
+## Now use the pretrained model
+modelName = 'pretrained{}_{}_{}_steps{}_start{}_end{}.model'.format(args.data_type1,args.model,args.data_type2,train_steps,startdate,splitdate)
+
+df_train = get_dataset(args.datadir,args.data_type2,args.start_date,args.split_date)
+df_train = get_dataset(args.datadir,args.data_type2,args.split_date,args.end_date)
+
+e_trade_gym = StockTradingEnv(df = df_train, **env_kwargs)
+e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
+
+
+trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
                             total_timesteps = train_steps,
                             eval_env = e_trade_gym,
                             n_eval_episodes = 10
                         )
-
-trained_model.save(os.path.join(args.modeldir,modelName))
