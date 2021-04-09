@@ -44,9 +44,6 @@ parser.add_argument('--data_type2',type = str,default = 'dow29',metavar = 'DTY')
 
 args = parser.parse_args()
 
-args.model = 'ppo'
-args.train_steps = 5
-
 
 if not args.model in config.AVAILABLE_MODELS:
     raise ValueError(f'Invalid model choice: must be one of {config.AVAILABLE_MODELS}')
