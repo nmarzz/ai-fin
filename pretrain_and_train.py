@@ -128,3 +128,5 @@ trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,da
                             eval_env = e_trade_gym,
                             n_eval_episodes = 10
                         )
+
+trained_model.save(os.path.join(args.modeldir,modelName))                        
