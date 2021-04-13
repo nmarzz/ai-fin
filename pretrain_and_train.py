@@ -118,6 +118,7 @@ if args.load_mod:
     elif args.model == 'sac':
         pretrained_model = model.load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
 
+    pretrained_model.env = env_trade_pre
 else:
     pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
                                 total_timesteps = train_steps,
@@ -129,9 +130,7 @@ else:
 
 
 
-print(pretrained_model.env)
-print(e_trade_gym_pre)
-print(env_trade_pre)
+
 ## Now use the pretrained model
 modelName = 'pretrained{}_{}_{}_steps{}_start{}_end{}.model'.format(args.data_type1,args.model,args.data_type2,train_steps,startdate,splitdate)
 
