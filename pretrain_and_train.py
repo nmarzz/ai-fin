@@ -34,7 +34,7 @@ parser.add_argument('--model', type=str, metavar='MOD',
                     help='Options [ppo,ddpg,a2c,td3,sac]')
 parser.add_argument('--train-steps',type = int,default = 50000, metavar = 'TS')
 parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
-parser.add_argument('--start-date',type = str,default = '2018-01-25', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--start-date',type = str,default = '2005-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--split-date',type = str,default = '2018-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--end-date',type = str,default = '2018-11-28', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
