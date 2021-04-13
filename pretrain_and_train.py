@@ -104,6 +104,8 @@ model = agent.get_model(args.model,
                         verbose = 1)
 
 print('Training model')
+print(model)
+
 if args.load_mod:
     # model_paths = ['models/models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model']
     if args.model == 'ppo':
