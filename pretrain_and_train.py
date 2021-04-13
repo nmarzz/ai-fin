@@ -128,6 +128,8 @@ else:
                             )
     pretrained_model.save(os.path.join(args.modeldir,modelName))
 
+
+
 print(pretrained_model)
 
 ## Now use the pretrained model
@@ -139,6 +141,7 @@ df_train = get_dataset(args.datadir,args.data_type2,args.split_date,args.end_dat
 e_trade_gym = StockTradingEnv(df = df_train, **env_kwargs)
 e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
 
+print(e_trade_gym)
 
 trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
                             total_timesteps = train_steps,
