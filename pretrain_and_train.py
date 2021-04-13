@@ -85,7 +85,7 @@ env_kwargs = {
     "stock_dim": stock_dimension,
     "tech_indicator_list": indicators,
     "action_space": stock_dimension,
-    "reward_scaling": 0.6
+    "reward_scaling": 1e-3
 }
 
 e_trade_gym_pre = StockTradingEnv(df = df_test_pre, **env_kwargs)
@@ -116,7 +116,6 @@ if args.load_mod:
         model = model.load('models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'sac':
         model = model.load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
-
 
 else:
     pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
