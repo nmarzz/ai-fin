@@ -145,8 +145,7 @@ print(e_trade_gym)
 print(e_train_gym)
 
 trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-                            total_timesteps = train_steps,                            
-                            n_eval_episodes = 10
+                            total_timesteps = train_steps                                                       
                         )
 
 trained_model.save(os.path.join(args.modeldir,modelName))
