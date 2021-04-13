@@ -36,7 +36,7 @@ parser.add_argument('--train-steps',type = int,default = 50000, metavar = 'TS')
 parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
 parser.add_argument('--start-date',type = str,default = '2018-01-25', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--split-date',type = str,default = '2018-11-28', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--end-date',type = str,default = '2018-11-29', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--end-date',type = str,default = '2018-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 parser.add_argument('--data_type1',type = str,default = 'nas29',metavar = 'DTY')
@@ -129,4 +129,4 @@ trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,da
                             n_eval_episodes = 10
                         )
 
-trained_model.save(os.path.join(args.modeldir,modelName))                        
+trained_model.save(os.path.join(args.modeldir,modelName))

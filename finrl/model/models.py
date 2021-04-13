@@ -75,6 +75,7 @@ class DRLAgent:
         actions_memory = []
         test_env.reset()
         for i in range(len(environment.df.index.unique())):
+
             action, _states = model.predict(test_obs)
             account_memory = test_env.env_method(method_name="save_asset_memory")
             actions_memory = test_env.env_method(method_name="save_action_memory")
@@ -84,6 +85,26 @@ class DRLAgent:
 
                 break
         return account_memory[0], actions_memory[0]
+
+
+    def average_predict(model,environment,n_evals=10):
+        values = []
+        actions = []
+        for i in range(n_evals):
+            account_value, action_value = DRLAgent.DRL_prediction(model,environment)
+            values.append(account_value)
+            actions.append(action_value)
+
+        value_sum = values[0]['account_value']
+        action_sum = actions[0]
+        for i in range(1,n_evals):
+            value_sum += values[i]['account_value']
+            action_sum += actions[i]
+
+        values[0]['account_value'] = value_sum / n_evals
+        action_sum /= n_evals
+
+        return values[0] , action_sum
 
     def __init__(self, env):
         self.env = env

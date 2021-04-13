@@ -33,7 +33,7 @@ from utils.models import EnsembleModel
 
 data_dir = 'data'
 # model_paths = ['models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ddpg_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ppo_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/sac_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/td3_dow29_steps100000_start2000-01-01_end2018-01-01.model']
-model_paths = 'models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model'
+model_paths = 'models/models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model'
 start_date,split_date,data_type ,model = get_model_info_from_path(model_paths)
 
 end_date = '2020-12-31' # Model is tested from split_date to end_date
@@ -70,7 +70,6 @@ if model == 'ensemble':
     trained_model = EnsembleModel(test_gym_env,model_paths,'binaverage')
 else:
     model_params = config.__dict__[f"{model.upper()}_PARAMS"]
-
     trained_model = agent.get_model(model,
                             model_kwargs = model_params,
                             verbose = 0).load(model_paths)
@@ -78,9 +77,9 @@ else:
 
 
 print('Testing...')
-df_account_value, df_actions = DRLAgent.DRL_prediction(
+df_account_value, df_actions = DRLAgent.average_predict(
     model=trained_model,
-    environment = test_gym_env)
+    environment = test_gym_env,n_evals = 3)
 
 
 
