@@ -142,6 +142,7 @@ e_trade_gym = StockTradingEnv(df = df_train, **env_kwargs)
 e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
 
 print(e_trade_gym)
+print(e_train_gym)
 
 trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
                             total_timesteps = train_steps,
