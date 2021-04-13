@@ -129,7 +129,7 @@ else:
 
 
 
-print(pretrained_model.env)
+print(pretrained_model.env == e_trade_gym_pre)
 ## Now use the pretrained model
 modelName = 'pretrained{}_{}_{}_steps{}_start{}_end{}.model'.format(args.data_type1,args.model,args.data_type2,train_steps,startdate,splitdate)
 
