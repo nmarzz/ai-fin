@@ -104,31 +104,24 @@ model = agent.get_model(args.model,
                         verbose = 1)
 
 print('Training model')
-print(model)
-print(args.load_mod)
 
 if args.load_mod:
+    pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+                                total_timesteps = 1,
+                                eval_env = e_trade_gym_pre,
+                                n_eval_episodes = 10
+                            )
     # model_paths = ['models/models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model']
     if args.model == 'ppo':
-        pretrained_model = agent.get_model(args.model,
-                                model_kwargs = model_params,
-                                verbose = 1).load('models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = pretrained_model.load('models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'a2c':
-        pretrained_model = agent.get_model(args.model,
-                                model_kwargs = model_params,
-                                verbose = 1).load('models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = pretrained_model.load('models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'td3':
-        pretrained_model = agent.get_model(args.model,
-                                model_kwargs = model_params,
-                                verbose = 1).load('models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = pretrained_model.load('models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'ddpg':
-        pretrained_model = agent.get_model(args.model,
-                                model_kwargs = model_params,
-                                verbose = 1).load('models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = pretrained_model.load('models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'sac':
-        pretrained_model = agent.get_model(args.model,
-                                model_kwargs = model_params,
-                                verbose = 1).load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = pretrained_model.load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
 
 else:
     pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
@@ -140,7 +133,7 @@ else:
 
 
 
-print(pretrained_model)
+
 
 ## Now use the pretrained model
 modelName = 'pretrained{}_{}_{}_steps{}_start{}_end{}.model'.format(args.data_type1,args.model,args.data_type2,train_steps,startdate,splitdate)
@@ -150,9 +143,6 @@ df_train = get_dataset(args.datadir,args.data_type2,args.split_date,args.end_dat
 
 e_trade_gym = StockTradingEnv(df = df_train, **env_kwargs)
 e_train_gym = StockTradingEnv(df = df_train, **env_kwargs)
-
-print(e_trade_gym)
-print(e_train_gym)
 
 trained_model = pretrained_model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
                             total_timesteps = train_steps,
