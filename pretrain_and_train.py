@@ -107,15 +107,15 @@ print('Training model')
 if args.load_mod:
     # model_paths = ['models/models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model']
     if args.model == 'ppo':
-        model = model.load('models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = model.load('models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'a2c':
-        model = model.load('models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = model.load('models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'td3':
-        model = model.load('models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = model.load('models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'ddpg':
-        model = model.load('models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = model.load('models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
     elif args.model == 'sac':
-        model = model.load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+        pretrained_model = model.load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
 
 else:
     pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
@@ -123,7 +123,6 @@ else:
                                 eval_env = e_trade_gym_pre,
                                 n_eval_episodes = 10
                             )
-
     pretrained_model.save(os.path.join(args.modeldir,modelName))
 
 
