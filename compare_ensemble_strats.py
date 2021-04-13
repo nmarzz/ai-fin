@@ -32,11 +32,18 @@ from utils.models import EnsembleModel
 
 
 data_dir = 'data'
-model_paths = ['models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ddpg_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ppo_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/sac_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/td3_dow29_steps100000_start2000-01-01_end2018-01-01.model']
-# model_paths = 'models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-010.model'
+# Dow
+# model_paths = ['models/models/a2c_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ddpg_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ppo_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/sac_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/td3_dow29_steps100000_start2000-01-01_end2018-01-01.model']
+# Dow without a2c
+model_paths = ['models/models/ddpg_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/ppo_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/sac_dow29_steps100000_start2000-01-01_end2018-01-01.model','models/models/td3_dow29_steps100000_start2000-01-01_end2018-01-01.model']
+# Nasdaq
+# model_paths = ['models/models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model']
 start_date,split_date,data_type ,model = get_model_info_from_path(model_paths)
 
 end_date = '2020-12-31' # Model is tested from split_date to end_date
+
+# end_date = '2018-01-01' # Model is tested from split_date to end_date
+# split_date = '2015-01-01'
 
 
 # Get data
@@ -79,7 +86,7 @@ else:
 print('Testing...')
 df_account_value, df_actions = DRLAgent.average_predict(
     model=trained_model,
-    environment = test_gym_env,n_evals = 3)
+    environment = test_gym_env,n_evals = 5)
 
 
 
@@ -93,9 +100,10 @@ dates_base = matplotlib.dates.date2num(dji['date'])
 
 init_dji_shares = 1000000/dji['close'][0]
 
+df_account_value.to_csv('results/binaverage_ensemble_accounts.csv')
+df_actions.to_csv('results/binaverage_ensemble_actions.csv')
 
 plt.plot_date(dates_rl,df_account_value['account_value'],'-')
-plt.plot_date(dates_base,dji['close'] * init_dji_shares,'-')
 plt.ylabel('Account Value')
 
 
@@ -117,9 +125,11 @@ else:
 print('Testing...')
 df_account_value, df_actions = DRLAgent.average_predict(
     model=trained_model,
-    environment = test_gym_env,n_evals = 3)
+    environment = test_gym_env,n_evals = 5)
 
 
+df_account_value.to_csv('results/average_ensemble_accounts.csv')
+df_actions.to_csv('results/average_ensemble_actions.csv')
 
 print('Comparing to DJI')
 dji = YahooDownloader(
@@ -134,7 +144,8 @@ init_dji_shares = 1000000/dji['close'][0]
 
 plt.plot_date(dates_rl,df_account_value['account_value'],'-')
 plt.plot_date(dates_base,dji['close'] * init_dji_shares,'-')
-plt.legend(['Binavg','avg','DJI'])
-plt.title(f'{model} model trained from {start_date}-{split_date}')
+plt.legend(['bin-avg','avg','dji'])
+plt.title(f'Ensemble trained from {start_date}-{split_date}')
 plt.ylabel('Account Value')
+plt.xticks(rotation=30)
 plt.savefig(f'imgs/{model}_vs_dji_{split_date}_{end_date}.png')

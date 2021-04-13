@@ -41,6 +41,7 @@ parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 parser.add_argument('--data_type1',type = str,default = 'nas29',metavar = 'DTY')
 parser.add_argument('--data_type2',type = str,default = 'dow29',metavar = 'DTY')
+parser.add_argument('--load-mod',type = bool,default = False,metavar = 'LOAD')
 
 args = parser.parse_args()
 
@@ -103,14 +104,28 @@ model = agent.get_model(args.model,
                         verbose = 1)
 
 print('Training model')
+if args.load_mod:
+    # model_paths = ['models/models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model','models/models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model']
+    if args.model == 'ppo':
+        model = model.load('models/ppo_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+    elif args.model == 'a2c':
+        model = model.load('models/a2c_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+    elif args.model == 'td3':
+        model = model.load('models/td3_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+    elif args.model == 'ddpg':
+        model = model.load('models/ddpg_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
+    elif args.model == 'sac':
+        model = model.load('models/sac_nas29_steps1000000_start2005-01-01_end2018-11-28.model')
 
-pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
-                            total_timesteps = train_steps,
-                            eval_env = e_trade_gym_pre,
-                            n_eval_episodes = 10
-                        )
 
-pretrained_model.save(os.path.join(args.modeldir,modelName))
+else:
+    pretrained_model = model.learn(tb_log_name = '{}_{}'.format(modelName,datetime.datetime.now()),
+                                total_timesteps = train_steps,
+                                eval_env = e_trade_gym_pre,
+                                n_eval_episodes = 10
+                            )
+
+    pretrained_model.save(os.path.join(args.modeldir,modelName))
 
 
 ## Now use the pretrained model
