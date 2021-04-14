@@ -35,17 +35,15 @@ parser.add_argument('--model', type=str, metavar='MOD',
 parser.add_argument('--train-steps',type = int,default = 50000, metavar = 'TS')
 parser.add_argument('--initial_investment',type = int,default = 1e6, metavar = 'INV')
 parser.add_argument('--start-date',type = str,default = '2018-01-25', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--split-date',type = str,default = '2018-11-28', metavar = 'STR',help = 'expects format YYYY-MM-DD')
-parser.add_argument('--end-date',type = str,default = '2018-11-29', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--split-date',type = str,default = '2018-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
+parser.add_argument('--end-date',type = str,default = '2021-01-01', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
 parser.add_argument('--data-type',type = str,default = 'dow29',metavar = 'DTY')
 
 args = parser.parse_args()
 
-args.model = 'a2c'
-args.train_steps = 2
-args.data_type = 'dow290'
+
 
 if not args.model in config.AVAILABLE_MODELS:
     raise ValueError(f'Invalid model choice: must be one of {config.AVAILABLE_MODELS}')
