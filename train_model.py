@@ -39,7 +39,7 @@ parser.add_argument('--split-date',type = str,default = '2018-11-28', metavar = 
 parser.add_argument('--end-date',type = str,default = '2018-11-29', metavar = 'STR',help = 'expects format YYYY-MM-DD')
 parser.add_argument('--modeldir',type = str,default = 'models', metavar = 'STR')
 parser.add_argument('--datadir',type = str,default = 'data', metavar = 'STR')
-parser.add_argument('--data_type',type = str,default = 'dow29',metavar = 'DTY')
+parser.add_argument('--data-type',type = str,default = 'dow29',metavar = 'DTY')
 
 args = parser.parse_args()
 
