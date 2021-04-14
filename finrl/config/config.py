@@ -22,7 +22,7 @@ TRAINED_MODEL_DIR = "trained_models"
 # TRAINING_DATA_FILE = "data/ETF_SPY_2009_2020.csv"
 # TURBULENCE_DATA = "data/dow30_turbulence_index.csv"
 # TESTING_DATA_FILE = "test.csv"
-SUPPORTED_DATA = ['dow29','crypto','nas29']
+SUPPORTED_DATA = ['dow29','crypto','nas29','dow290','dow29w0']
 # now = datetime.datetime.now()
 # TRAINED_MODEL_DIR = f"trained_models/{now}"
 DATA_SAVE_DIR = "datasets"
@@ -44,6 +44,7 @@ DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 ## stockstats technical indicator column names
 ## check https://pypi.org/project/stockstats/ for different names
 TECHNICAL_INDICATORS_LIST = ["macd","boll_ub","boll_lb","rsi_30", "cci_30", "dx_30","close_30_sma","close_60_sma"]
+TECHNICAL_INDICATORS_LIST_W_CROSSINGS = ["macd","boll_ub","boll_lb","rsi_30", "cci_30", "dx_30","close_30_sma","close_60_sma","4/10_crossing_cluster","20/100_crossing_cluster"]
 
 
 ## Model Parameters

@@ -43,6 +43,10 @@ parser.add_argument('--data_type',type = str,default = 'dow29',metavar = 'DTY')
 
 args = parser.parse_args()
 
+args.model = 'a2c'
+args.train_steps = 2
+args.data_type = 'dow290'
+
 if not args.model in config.AVAILABLE_MODELS:
     raise ValueError(f'Invalid model choice: must be one of {config.AVAILABLE_MODELS}')
 
@@ -59,7 +63,10 @@ enddate = args.end_date
 train_steps = args.train_steps
 modelName = '{}_{}_steps{}_start{}_end{}.model'.format(args.model,args.data_type,train_steps,startdate,splitdate)
 
-indicators = config.TECHNICAL_INDICATORS_LIST
+if args.data_type == 'dow290' or args.data_type == 'dow29w0':
+    indicators = config.TECHNICAL_INDICATORS_LIST_W_CROSSINGS
+else:
+    indicators = config.TECHNICAL_INDICATORS_LIST
 # Get data
 df_train = get_dataset(args.datadir,args.data_type,args.start_date,args.split_date)
 df_test = get_dataset(args.datadir,args.data_type,args.split_date,args.end_date)
@@ -68,8 +75,6 @@ df_test = get_dataset(args.datadir,args.data_type,args.split_date,args.end_date)
 stock_dimension = len(df_train.tic.unique())
 state_space = 1 + 2*stock_dimension + len(indicators)*stock_dimension
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
-
-
 
 env_kwargs = {
     "hmax": 500,

@@ -82,11 +82,17 @@ def get_dataset(datadir,data_type,start_date,end_date):
 
             processed_full = processed_full.fillna(0)
             processed.to_csv(data_path,index = False)
+
+        elif data_type == 'dow290':
+            raise ValueError('Need to add dow29 with zeros crossings to data directory')
+        elif data_type == 'dow29w0':
+            raise ValueError('Need to add dow29 with OUT zeros crossings to data directory')
         else:
             raise ValueError('Need to add crypto data to data directory')
 
     # Load and subset data
     full_df = pd.read_csv(data_path)
+
     max_date = max(full_df['date'])
     min_date = min(full_df['date'])
 
