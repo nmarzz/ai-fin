@@ -8,6 +8,8 @@ A repo for our COMP 598 project exploring applications of deep learning to finan
 - Consider a novel technical indicator 
 - Explore pre-training models on other financial data
 
+Results data as well as trained models are available at the following Google drive directory: [Drive](https://drive.google.com/drive/folders/1e0cGoQjEGjjN3G3Gv6-_uSadLQXeRnT6?usp=sharing)
+
 ## About 'finrl' 
 
 The 'finrl' folder is a modified version of the [FinRL-Library](https://github.com/AI4Finance-LLC/FinRL-Library) by Liu, Xiao-Yang and Yang, Hongyang and Chen, Qian and Zhang, Runjia and Yang, Liuqing and Xiao, Bowen and Wang, Christina Dan. The work contained therein is (with the exception of slight modifications, bug fixes) not our original work. 
